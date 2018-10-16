@@ -3,16 +3,11 @@ package io.github.cristaling.swegg.backend.web.responses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class LoginResponse extends ResponseEntity {
+public class LoginResponse {
 
 	private String token;
 
-	public LoginResponse(HttpStatus status) {
-		super(status);
-	}
-
 	public LoginResponse(String token) {
-		super(HttpStatus.OK);
 		this.token = token;
 	}
 
