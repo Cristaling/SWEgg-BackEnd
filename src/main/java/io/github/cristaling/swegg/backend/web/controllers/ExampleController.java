@@ -1,6 +1,6 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
-import io.github.cristaling.swegg.backend.core.User;
+import io.github.cristaling.swegg.backend.core.user.User;
 import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;

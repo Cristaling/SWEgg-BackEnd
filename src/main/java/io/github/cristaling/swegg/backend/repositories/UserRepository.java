@@ -1,6 +1,6 @@
 package io.github.cristaling.swegg.backend.repositories;
 
-import io.github.cristaling.swegg.backend.core.User;
+import io.github.cristaling.swegg.backend.core.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

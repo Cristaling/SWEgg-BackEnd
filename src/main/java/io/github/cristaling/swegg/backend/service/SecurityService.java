@@ -1,6 +1,6 @@
 package io.github.cristaling.swegg.backend.service;
 
-import io.github.cristaling.swegg.backend.core.User;
+import io.github.cristaling.swegg.backend.core.user.User;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import io.github.cristaling.swegg.backend.utils.SecurityUtils;
 import io.github.cristaling.swegg.backend.utils.enums.UserRole;
