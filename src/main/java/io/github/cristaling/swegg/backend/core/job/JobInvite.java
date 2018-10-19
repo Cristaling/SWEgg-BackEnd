@@ -23,11 +23,11 @@ public class JobInvite {
 	private UUID uuid;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
-	@JoinColumn(name = "uuid")
+	@JoinColumn(name = "user_uuid", nullable = false)
 	private User user;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
-	@JoinColumn(name = "uuid")
+	@JoinColumn(name = "job_uuid", nullable = false)
 	private Job job;
 
 	public void setUuid(UUID uuid) {

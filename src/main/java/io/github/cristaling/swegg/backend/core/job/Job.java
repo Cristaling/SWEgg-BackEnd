@@ -27,7 +27,7 @@ public class Job {
 	private UUID uuid;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
-	@JoinColumn(name = "uuid")
+	@JoinColumn(name = "user_uuid", nullable = false)
 	private User owner;
 
 	@Enumerated(EnumType.STRING)

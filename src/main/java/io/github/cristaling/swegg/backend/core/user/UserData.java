@@ -24,7 +24,7 @@ public class UserData {
 	private UUID uuid;
 
 	@OneToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "uuid", nullable = false)
+	@JoinColumn(name = "user_uuid", nullable = false)
 	private User user;
 
 	@NotNull
