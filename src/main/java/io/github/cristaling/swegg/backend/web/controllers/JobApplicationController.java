@@ -21,13 +21,14 @@ public class JobApplicationController {
         this.jobApplicationRepository=jobApplicationRepository;
     }
 
-    @RequestMapping("/addapplication")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addJobApplication(@RequestBody JobApplication jobApplication){
+    @PostMapping("/addapplication")
+    @ResponseStatus(HttpStatus.CREATED)
+    public JobApplication addJobApplication(@RequestBody JobApplication jobApplication){
         jobApplicationRepository.save(jobApplication);
+        return jobApplication;
     }
 
-    @RequestMapping("/getallapplications")
+    @GetMapping("/getallapplications")
     public List<JobApplication> getAllApplications(){
         return  jobApplicationRepository.findAll();
     }
