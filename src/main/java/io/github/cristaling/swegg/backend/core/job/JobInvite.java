@@ -14,7 +14,7 @@ import javax.persistence.Table;
 import java.util.UUID;
 
 @Entity
-@Table(name = "job_applications")
+@Table(name = "job_invites")
 public class JobInvite {
 
 	@Id
