@@ -2,9 +2,11 @@ package io.github.cristaling.swegg.backend.web.controllers;
 
 
 import io.github.cristaling.swegg.backend.core.job.JobApplication;
-import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
+import io.github.cristaling.swegg.backend.service.JobApplicationService;
+import io.github.cristaling.swegg.backend.web.requests.JobApplicationAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,22 +16,25 @@ import java.util.List;
 @RequestMapping("/api/jobapplication")
 public class JobApplicationController {
 
-    private JobApplicationRepository jobApplicationRepository;
+    private JobApplicationService jobApplicationService;
 
     @Autowired
-    public JobApplicationController(JobApplicationRepository jobApplicationRepository){
-        this.jobApplicationRepository=jobApplicationRepository;
+    public JobApplicationController(JobApplicationService jobApplicationService) {
+        this.jobApplicationService = jobApplicationService;
     }
 
-    @PostMapping("/addapplication")
-    @ResponseStatus(HttpStatus.CREATED)
-    public JobApplication addJobApplication(@RequestBody JobApplication jobApplication){
-        jobApplicationRepository.save(jobApplication);
-        return jobApplication;
+    @PostMapping("/add")
+    public ResponseEntity addJobApplication(@RequestBody JobApplicationAddRequest jobApplicationAddRequest) {
+        JobApplication jobApplication = this.jobApplicationService.addJobApplication(jobApplicationAddRequest);
+        if (jobApplication == null) {
+            return new ResponseEntity("JobApplication for Job by User already exists", HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity(HttpStatus.OK);
+
     }
 
-    @GetMapping("/getallapplications")
-    public List<JobApplication> getAllApplications(){
-        return  jobApplicationRepository.findAll();
+    @GetMapping("/get-all")
+    public List<JobApplication> getAllApplications() {
+        return jobApplicationService.getAll();
     }
 }
