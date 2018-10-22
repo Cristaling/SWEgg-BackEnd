@@ -2,7 +2,7 @@
 
 This will guide you to run the backend on your machine
 
-##Java
+## Java
 
 	Install java jdk 8 and Intellij:
 	
@@ -10,7 +10,7 @@ This will guide you to run the backend on your machine
 	
 	[IntelliJ](https://www.jetbrains.com/idea/)
 	
-##Postgre
+## Postgre
 
 	Install PostgreSQL with default settings
 
@@ -32,6 +32,6 @@ This will guide you to run the backend on your machine
 	
 	[User Privileges](https://i.imgur.com/iJL9QI1.png)
 
-##Back End
+## Back End
 
 	Clone the backend and open with IntelliJ AND ENABLE Auto-Import in the lower right corner
