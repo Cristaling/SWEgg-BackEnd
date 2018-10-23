@@ -3,15 +3,8 @@ package io.github.cristaling.swegg.backend.core.user;
 import io.github.cristaling.swegg.backend.utils.enums.UserRole;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -25,7 +18,9 @@ public class User {
 	private UUID uuid;
 
 	@NotNull
-	private String username;
+	@Email
+	@Column(unique = true)
+	private String email;
 
 	@NotNull
 	private String password;
@@ -38,14 +33,6 @@ public class User {
 
 	public UUID getUuid() {
 		return uuid;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
 	}
 
 	public String getPassword() {
@@ -70,5 +57,13 @@ public class User {
 
 	public void setUserData(UserData userData) {
 		this.userData = userData;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 }

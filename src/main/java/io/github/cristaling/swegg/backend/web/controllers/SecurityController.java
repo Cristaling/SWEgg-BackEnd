@@ -14,23 +14,23 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/security")
-public class LoginController {
+public class SecurityController {
 
 	private SecurityService securityService;
 
 	@Autowired
-	public LoginController(SecurityService securityService) {
+	public SecurityController(SecurityService securityService) {
 		this.securityService = securityService;
 	}
 
 	/**
-	 * @param request Contains the username and password to login
+	 * @param request Contains the email and password to login
 	 * @return Contains a token for accessing the API
 	 */
 	@RequestMapping("/login")
 	public ResponseEntity
 	login(@RequestBody LoginRequest request) {
-		String token = this.securityService.login(request.getUsername(), request.getPassword());
+		String token = this.securityService.login(request.getEmail(), request.getPassword());
 		if (token == null) {
 			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
