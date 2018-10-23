@@ -22,20 +22,20 @@ public class SecurityService {
 	}
 
 	/**
-	 * @param username Username
+	 * @param email Email
 	 * @param password Password hashed with md5 on client
-	 * @return Access token or null if username and password are not correct
+	 * @return Access token or null if email and password are not correct
 	 */
-	public String login(String username, String password) {
+	public String login(String email, String password) {
 
-		if (username == null || password == null) {
+		if (email == null || password == null) {
 			return null;
 		}
 
 		User user;
 
 		try {
-			user = this.userRepository.getUserByUsernameAndPassword(username, password);
+			user = this.userRepository.getUserByEmailAndPassword(email, password);
 		} catch (EntityNotFoundException ex) {
 			return null;
 		}

@@ -21,7 +21,11 @@ public class RegisterController {
         this.registerService = registerService;
     }
 
-
+    /**
+     * @param registerRequest (email, pass, birth date, town, first name, last name)
+     * @return Status 409 if email already exists
+     *         Status 200 if a user was saved successfully
+     */
     @PostMapping("/register")
     public ResponseEntity registerUser(@RequestBody RegisterRequest registerRequest) {
         User registered = this.registerService.registerUserAccount(registerRequest);

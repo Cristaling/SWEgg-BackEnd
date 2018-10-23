@@ -2,7 +2,6 @@ package io.github.cristaling.swegg.backend.core.user;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -10,9 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -29,18 +27,13 @@ public class UserData {
 	private User user;
 
 	@NotNull
-	@Email
-	@Column(unique = true)
-	private String email;
-
-	@NotNull
 	private String firstName;
 
 	@NotNull
 	private String lastName;
 
 	@NotNull
-	private LocalDate birthDate;
+	private Date birthDate;
 
 	private String town;
 
@@ -54,14 +47,6 @@ public class UserData {
 
 	public void setUser(User user) {
 		this.user = user;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public String getFirstName() {
@@ -80,13 +65,6 @@ public class UserData {
 		this.lastName = lastName;
 	}
 
-	public LocalDate getBirthDate() {
-		return birthDate;
-	}
-
-	public void setBirthDate(LocalDate birthDate) {
-		this.birthDate = birthDate;
-	}
 
 	public String getTown() {
 		return town;
@@ -95,4 +73,12 @@ public class UserData {
 	public void setTown(String town) {
 		this.town = town;
 	}
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
 }

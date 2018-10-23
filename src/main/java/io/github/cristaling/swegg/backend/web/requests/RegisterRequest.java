@@ -1,16 +1,17 @@
 package io.github.cristaling.swegg.backend.web.requests;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class RegisterRequest implements Serializable {
     private String email;
     private String password;
     private String firstName;
     private String lastName;
-    private String birthDate;
+    private Date birthDate;
     private String town;
 
-    public RegisterRequest(String email, String password, String firstName, String lastName, String birthDate, String town) {
+    public RegisterRequest(String email, String password, String firstName, String lastName, Date birthDate, String town) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -54,13 +55,6 @@ public class RegisterRequest implements Serializable {
         this.lastName = lastName;
     }
 
-    public String getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(String birthDate) {
-        this.birthDate = birthDate;
-    }
 
     public String getTown() {
         return town;
@@ -68,5 +62,13 @@ public class RegisterRequest implements Serializable {
 
     public void setTown(String town) {
         this.town = town;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
     }
 }
