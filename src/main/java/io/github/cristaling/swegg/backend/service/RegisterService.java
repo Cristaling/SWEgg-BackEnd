@@ -1,7 +1,7 @@
 package io.github.cristaling.swegg.backend.service;
 
-import io.github.cristaling.swegg.backend.core.user.User;
-import io.github.cristaling.swegg.backend.core.user.UserData;
+import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.member.MemberData;
 import io.github.cristaling.swegg.backend.repositories.UserDataRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import io.github.cristaling.swegg.backend.web.requests.RegisterRequest;
@@ -26,26 +26,26 @@ public class RegisterService {
      *         user-> if it was successful
      *  Save a userData and a user in db
      */
-    public User registerUserAccount(RegisterRequest registerRequest) {
+    public Member registerUserAccount(RegisterRequest registerRequest) {
         if (userRepository.getUserByEmail(registerRequest.getEmail()) != null) {
             return null;
         }
-        UserData userData = new UserData();
-        userData.setBirthDate(registerRequest.getBirthDate());
-        userData.setFirstName(registerRequest.getFirstName());
-        userData.setLastName(registerRequest.getLastName());
-        userData.setTown(registerRequest.getTown());
-        User user = new User();
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(registerRequest.getPassword());
-        user.setUserData(userData);
-        userData.setUser(user);
-        userRepository.save(user);
+        MemberData memberData = new MemberData();
+        memberData.setBirthDate(registerRequest.getBirthDate());
+        memberData.setFirstName(registerRequest.getFirstName());
+        memberData.setLastName(registerRequest.getLastName());
+        memberData.setTown(registerRequest.getTown());
+        Member member = new Member();
+        member.setEmail(registerRequest.getEmail());
+        member.setPassword(registerRequest.getPassword());
+//        member.setMemberData(memberData);
+//        memberData.setMember(member);
+        userRepository.save(member);
         userRepository.flush();
-        userDataRepository.save(userData);
+        userDataRepository.save(memberData);
         userDataRepository.flush();
 
-        return user;
+        return member;
 
     }
 }

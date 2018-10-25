@@ -27,7 +27,7 @@ public class JobApplicationController {
     public ResponseEntity addJobApplication(@RequestBody JobApplicationAddRequest jobApplicationAddRequest) {
         JobApplication jobApplication = this.jobApplicationService.addJobApplication(jobApplicationAddRequest);
         if (jobApplication == null) {
-            return new ResponseEntity("JobApplication for Job by User already exists", HttpStatus.CONFLICT);
+            return new ResponseEntity("JobApplication for Job by Member already exists", HttpStatus.CONFLICT);
         }
         return new ResponseEntity(HttpStatus.OK);
 

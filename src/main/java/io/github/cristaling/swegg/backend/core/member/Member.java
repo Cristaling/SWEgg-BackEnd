@@ -1,6 +1,6 @@
-package io.github.cristaling.swegg.backend.core.user;
+package io.github.cristaling.swegg.backend.core.member;
 
-import io.github.cristaling.swegg.backend.utils.enums.UserRole;
+import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -9,8 +9,8 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "members")
+public class Member {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
@@ -26,10 +26,10 @@ public class User {
 	private String password;
 
 	@Enumerated(EnumType.STRING)
-	private UserRole role;
+	private MemberRole role;
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
-	private UserData userData;
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "member")
+	private MemberData memberData;
 
 	public UUID getUuid() {
 		return uuid;
@@ -43,20 +43,20 @@ public class User {
 		this.password = password;
 	}
 
-	public UserRole getRole() {
+	public MemberRole getRole() {
 		return role;
 	}
 
-	public void setRole(UserRole role) {
+	public void setRole(MemberRole role) {
 		this.role = role;
 	}
 
-	public UserData getUserData() {
-		return userData;
+	public MemberData getMemberData() {
+		return memberData;
 	}
 
-	public void setUserData(UserData userData) {
-		this.userData = userData;
+	public void setMemberData(MemberData memberData) {
+		this.memberData = memberData;
 	}
 
 	public String getEmail() {

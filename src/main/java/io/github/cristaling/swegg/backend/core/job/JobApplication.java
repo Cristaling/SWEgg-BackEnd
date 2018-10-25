@@ -1,6 +1,6 @@
 package io.github.cristaling.swegg.backend.core.job;
 
-import io.github.cristaling.swegg.backend.core.user.User;
+import io.github.cristaling.swegg.backend.core.member.Member;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.CascadeType;
@@ -24,7 +24,7 @@ public class JobApplication {
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
 	@JoinColumn(name = "user_uuid", nullable = false)
-	private User applicant;
+	private Member applicant;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
 	@JoinColumn(name = "job_uuid", nullable = false)
@@ -34,11 +34,11 @@ public class JobApplication {
 		this.uuid = uuid;
 	}
 
-	public User getApplicant() {
+	public Member getApplicant() {
 		return applicant;
 	}
 
-	public void setApplicant(User applicant) {
+	public void setApplicant(Member applicant) {
 		this.applicant = applicant;
 	}
 
