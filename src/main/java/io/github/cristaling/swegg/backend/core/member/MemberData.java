@@ -1,4 +1,4 @@
-package io.github.cristaling.swegg.backend.core.user;
+package io.github.cristaling.swegg.backend.core.member;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -14,8 +14,8 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user_data")
-public class UserData {
+@Table(name = "member_data")
+public class MemberData {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
@@ -23,8 +23,8 @@ public class UserData {
 	private UUID uuid;
 
 	@OneToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "user_uuid", nullable = false)
-	private User user;
+	@JoinColumn(name = "member_uuid", nullable = false)
+	private Member member;
 
 	@NotNull
 	private String firstName;
@@ -41,12 +41,12 @@ public class UserData {
 		return uuid;
 	}
 
-	public User getUser() {
-		return user;
+	public Member getMember() {
+		return member;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setMember(Member member) {
+		this.member = member;
 	}
 
 	public String getFirstName() {

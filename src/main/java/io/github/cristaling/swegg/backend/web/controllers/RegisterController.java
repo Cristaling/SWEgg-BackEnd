@@ -1,6 +1,6 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
-import io.github.cristaling.swegg.backend.core.user.User;
+import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.service.RegisterService;
 import io.github.cristaling.swegg.backend.web.requests.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class RegisterController {
      */
     @PostMapping("/register")
     public ResponseEntity registerUser(@RequestBody RegisterRequest registerRequest) {
-        User registered = this.registerService.registerUserAccount(registerRequest);
+        Member registered = this.registerService.registerUserAccount(registerRequest);
         if (registered == null) {
             return new ResponseEntity("Email already exists",HttpStatus.CONFLICT);
         }

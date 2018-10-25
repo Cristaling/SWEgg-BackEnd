@@ -1,8 +1,8 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
-import io.github.cristaling.swegg.backend.core.user.User;
+import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.service.SecurityService;
-import io.github.cristaling.swegg.backend.utils.enums.UserRole;
+import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +25,8 @@ public class ExampleController {
 	}
 
 	@RequestMapping("/test")
-	public ResponseEntity testLogin(@RequestHeader("token") String token, @RequestBody User request) {
-		if (!this.securityService.canAccessRole(token, UserRole.PROVIDER)) {
+	public ResponseEntity testLogin(@RequestHeader("token") String token, @RequestBody Member request) {
+		if (!this.securityService.canAccessRole(token, MemberRole.PROVIDER)) {
 			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
 		return new ResponseEntity("Good Job", HttpStatus.OK);
