@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProfileService {
+public class UserService {
     private UserRepository userRepository;
     private SecurityService securityService;
 
     @Autowired
-    public ProfileService(UserRepository userRepository, SecurityService securityService) {
+    public UserService(UserRepository userRepository, SecurityService securityService) {
         this.userRepository = userRepository;
         this.securityService = securityService;
     }

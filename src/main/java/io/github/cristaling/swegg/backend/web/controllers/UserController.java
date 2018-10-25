@@ -1,6 +1,6 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
-import io.github.cristaling.swegg.backend.service.ProfileService;
+import io.github.cristaling.swegg.backend.service.UserService;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/user")
-public class ProfileController {
+public class UserController {
 
-    private ProfileService profileService;
+    private UserService userService;
 
     @Autowired
-    public ProfileController(ProfileService profileService) {
-        this.profileService = profileService;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     /**
@@ -26,9 +26,9 @@ public class ProfileController {
      */
     @GetMapping("/profile")
     public ResponseEntity getProfile(String email, @RequestHeader("Authorization") String token) {
-        ProfileResponse profileResponse= profileService.getProfile(email,token);
+        ProfileResponse profileResponse= userService.getProfile(email,token);
         if(profileResponse!=null)
-            return new ResponseEntity(profileService.getProfile(email,token), HttpStatus.OK);
+            return new ResponseEntity(userService.getProfile(email,token), HttpStatus.OK);
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 }
