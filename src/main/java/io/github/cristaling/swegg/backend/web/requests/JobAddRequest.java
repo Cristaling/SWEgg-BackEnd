@@ -4,11 +4,7 @@ import io.github.cristaling.swegg.backend.core.user.User;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
 
-import java.util.UUID;
-
 public class JobAddRequest {
-
-    private UUID uuid;
 
     private User owner;
 
@@ -16,19 +12,16 @@ public class JobAddRequest {
 
     private JobStatus jobStatus;
 
-    public JobAddRequest(UUID uuid, User owner, JobType jobType, JobStatus jobStatus) {
-        this.uuid = uuid;
+    private String title;
+
+    private String description;
+
+    public JobAddRequest(User owner, JobType jobType, JobStatus jobStatus, String title, String description) {
         this.owner = owner;
         this.jobType = jobType;
         this.jobStatus = jobStatus;
-    }
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+        this.title = title;
+        this.description = description;
     }
 
     public User getOwner() {
@@ -53,5 +46,21 @@ public class JobAddRequest {
 
     public void setJobStatus(JobStatus jobStatus) {
         this.jobStatus = jobStatus;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

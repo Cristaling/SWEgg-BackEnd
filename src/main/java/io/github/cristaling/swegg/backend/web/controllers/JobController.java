@@ -32,7 +32,7 @@ public class JobController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @GetMapping("/get-all")
+    @GetMapping("/all")
     public List<Job> getAllApplications() {
         return jobService.getAll();
     }
