@@ -2,6 +2,7 @@ package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
+import io.github.cristaling.swegg.backend.utils.enums.UserRole;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +14,18 @@ public class JobService {
 
     private JobRepository jobRepository;
 
+    private SecurityService securityService;
+
     @Autowired
-    public JobService(JobRepository jobRepository) {
+    public JobService(JobRepository jobRepository, SecurityService securityService) {
         this.jobRepository = jobRepository;
+        this.securityService = securityService;
     }
 
-    public Job addJob(JobAddRequest jobAddRequest) {
+    public Job addJob(JobAddRequest jobAddRequest, String token) {
+        if (!securityService.canAccessRole(token, UserRole.CLIENT)) {
+            return null;
+        }
         if (jobRepository.getJobByOwnerAndJobStatus(jobAddRequest.getOwner(), jobAddRequest.getJobStatus()) != null) {
             return null;
         }

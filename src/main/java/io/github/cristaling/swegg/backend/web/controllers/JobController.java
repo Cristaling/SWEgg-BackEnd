@@ -24,10 +24,10 @@ public class JobController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity addJob(@RequestBody JobAddRequest jobAddRequest) {
-        Job job = jobService.addJob(jobAddRequest);
+    public ResponseEntity addJob(@RequestHeader("token") String token,@RequestBody JobAddRequest jobAddRequest) {
+        Job job = jobService.addJob(jobAddRequest,token);
         if (job == null) {
-            return new ResponseEntity("Job from this Owner with this status already exists", HttpStatus.CONFLICT);
+            return new ResponseEntity("Job from this Owner with this status already exists or user doesnt have permission", HttpStatus.CONFLICT);
         }
         return new ResponseEntity(HttpStatus.OK);
     }
