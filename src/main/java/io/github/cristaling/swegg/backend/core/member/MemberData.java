@@ -31,8 +31,7 @@ public class MemberData {
 
 	@NotNull
 	private String lastName;
-
-	@NotNull
+	
 	private Date birthDate;
 
 	private String town;
