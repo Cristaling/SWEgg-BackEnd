@@ -27,7 +27,8 @@ public class RegisterService {
      *  Save a userData and a user in db
      */
     public Member registerUserAccount(RegisterRequest registerRequest) {
-        if (userRepository.getUserByEmail(registerRequest.getEmail()) != null) {
+        Member memberEx=userRepository.getMemberByEmail(registerRequest.getEmail());
+        if ( memberEx!= null) {
             return null;
         }
         MemberData memberData = new MemberData();
@@ -38,10 +39,11 @@ public class RegisterService {
         Member member = new Member();
         member.setEmail(registerRequest.getEmail());
         member.setPassword(registerRequest.getPassword());
-//        member.setMemberData(memberData);
-//        memberData.setMember(member);
+        member.setMemberData(memberData);
+        memberData.setMember(member);
         userRepository.save(member);
         userRepository.flush();
+
         userDataRepository.save(memberData);
         userDataRepository.flush();
 

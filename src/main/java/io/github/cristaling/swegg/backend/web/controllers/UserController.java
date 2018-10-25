@@ -1,5 +1,7 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
+import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.service.UserService;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private UserService userService;
+    private SecurityService securityService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, SecurityService securityService) {
         this.userService = userService;
+        this.securityService = securityService;
     }
 
     /**
@@ -26,9 +30,13 @@ public class UserController {
      */
     @GetMapping("/profile")
     public ResponseEntity getProfile(String email, @RequestHeader("Authorization") String token) {
-        ProfileResponse profileResponse= userService.getProfile(email,token);
+        Member userByToken = null;
+        if (!token.equals("")) {
+            userByToken = securityService.getUserByToken(token);
+        }
+        ProfileResponse profileResponse= userService.getProfile(email,userByToken);
         if(profileResponse!=null)
-            return new ResponseEntity(userService.getProfile(email,token), HttpStatus.OK);
+            return new ResponseEntity(profileResponse, HttpStatus.OK);
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 }

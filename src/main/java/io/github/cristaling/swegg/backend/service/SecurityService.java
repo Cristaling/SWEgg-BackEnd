@@ -35,7 +35,7 @@ public class SecurityService {
 		Member member;
 
 		try {
-			member = this.userRepository.getUserByEmailAndPassword(email, password);
+			member = this.userRepository.getMemberByEmailAndPassword(email, password);
 		} catch (EntityNotFoundException ex) {
 			return null;
 		}

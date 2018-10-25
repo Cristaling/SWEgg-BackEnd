@@ -28,7 +28,7 @@ public class Member {
 	@Enumerated(EnumType.STRING)
 	private MemberRole role;
 
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "member")
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "member" ,cascade= CascadeType.ALL)
 	private MemberData memberData;
 
 	public UUID getUuid() {

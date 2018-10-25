@@ -9,7 +9,7 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<Member, UUID> {
 
-    Member getUserByEmailAndPassword(String email, String password);
-    Member getUserByEmail(String email);
+    Member getMemberByEmailAndPassword(String email, String password);
+    Member getMemberByEmail(String email);
 
 }
