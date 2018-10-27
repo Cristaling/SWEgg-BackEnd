@@ -28,7 +28,7 @@ public class JobController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity addJob(@RequestHeader("token") String token,@RequestBody JobAddRequest jobAddRequest) {
+    public ResponseEntity addJob(@RequestHeader("Authorization") String token,@RequestBody JobAddRequest jobAddRequest) {
 
         if (!securityService.canAccessRole(token, UserRole.CLIENT)) {
             return new ResponseEntity("User doesnt have permission",HttpStatus.UNAUTHORIZED);
@@ -36,12 +36,12 @@ public class JobController {
         Job job = jobService.addJob(jobAddRequest);
 
         if (job == null) {
-            return new ResponseEntity("Job from this Owner with this status already exists", HttpStatus.CONFLICT);
+            return new ResponseEntity("Job from this Owner with this status already exists", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public List<Job> getAllApplications() {
         return jobService.getAll();
     }

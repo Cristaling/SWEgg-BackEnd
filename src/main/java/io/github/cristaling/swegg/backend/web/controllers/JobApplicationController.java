@@ -15,7 +15,7 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/jobapplication")
+@RequestMapping("/api/job-application")
 public class JobApplicationController {
 
     private JobApplicationService jobApplicationService;
@@ -29,7 +29,7 @@ public class JobApplicationController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity addJobApplication(@RequestHeader("token") String token, @RequestBody JobApplicationAddRequest jobApplicationAddRequest) {
+    public ResponseEntity addJobApplication(@RequestHeader("Authorization") String token, @RequestBody JobApplicationAddRequest jobApplicationAddRequest) {
 
         if (!securityService.canAccessRole(token, UserRole.PROVIDER)) {
             return new ResponseEntity("User doesnt have permission", HttpStatus.UNAUTHORIZED);
@@ -37,12 +37,12 @@ public class JobApplicationController {
         JobApplication jobApplication = this.jobApplicationService.addJobApplication(jobApplicationAddRequest);
 
         if (jobApplication == null) {
-            return new ResponseEntity("JobApplication for Job by User already exists", HttpStatus.CONFLICT);
+            return new ResponseEntity("JobApplication for Job by User already exists", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    @GetMapping("/get-all")
+    @GetMapping
     public List<JobApplication> getAllApplications() {
         return jobApplicationService.getAll();
     }
