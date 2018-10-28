@@ -1,6 +1,6 @@
 package io.github.cristaling.swegg.backend.core.job;
 
-import io.github.cristaling.swegg.backend.core.user.User;
+import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
 import org.hibernate.annotations.GenericGenerator;
@@ -28,7 +28,7 @@ public class Job {
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
 	@JoinColumn(name = "user_uuid", nullable = false)
-	private User owner;
+	private Member owner;
 
 	@Enumerated(EnumType.STRING)
 	private JobType jobType;
@@ -44,11 +44,11 @@ public class Job {
 		return uuid;
 	}
 
-	public User getOwner() {
+	public Member getOwner() {
 		return owner;
 	}
 
-	public void setOwner(User owner) {
+	public void setOwner(Member owner) {
 		this.owner = owner;
 	}
 

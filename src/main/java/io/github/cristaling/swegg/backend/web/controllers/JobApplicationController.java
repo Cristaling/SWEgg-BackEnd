@@ -32,12 +32,13 @@ public class JobApplicationController {
     public ResponseEntity addJobApplication(@RequestHeader("Authorization") String token, @RequestBody JobApplicationAddRequest jobApplicationAddRequest) {
 
         if (!securityService.canAccessRole(token, UserRole.PROVIDER)) {
-            return new ResponseEntity("User doesnt have permission", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity("Member doesnt have permission", HttpStatus.UNAUTHORIZED);
         }
         JobApplication jobApplication = this.jobApplicationService.addJobApplication(jobApplicationAddRequest);
 
         if (jobApplication == null) {
-            return new ResponseEntity("JobApplication for Job by User already exists", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("JobApplication for Job by Member already exists", HttpStatus.BAD_REQUEST);
+
         }
         return new ResponseEntity(HttpStatus.CREATED);
     }
