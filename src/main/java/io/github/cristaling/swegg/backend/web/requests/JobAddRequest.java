@@ -1,12 +1,12 @@
 package io.github.cristaling.swegg.backend.web.requests;
 
-import io.github.cristaling.swegg.backend.core.user.User;
+import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
 
 public class JobAddRequest {
 
-    private User owner;
+    private Member owner;
 
     private JobType jobType;
 
@@ -16,7 +16,7 @@ public class JobAddRequest {
 
     private String description;
 
-    public JobAddRequest(User owner, JobType jobType, JobStatus jobStatus, String title, String description) {
+    public JobAddRequest(Member owner, JobType jobType, JobStatus jobStatus, String title, String description) {
         this.owner = owner;
         this.jobType = jobType;
         this.jobStatus = jobStatus;
@@ -24,11 +24,11 @@ public class JobAddRequest {
         this.description = description;
     }
 
-    public User getOwner() {
+    public Member getOwner() {
         return owner;
     }
 
-    public void setOwner(User owner) {
+    public void setOwner(Member owner) {
         this.owner = owner;
     }
 

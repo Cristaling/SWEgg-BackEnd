@@ -3,12 +3,18 @@ package io.github.cristaling.swegg.backend.web.controllers;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.service.JobService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
-import io.github.cristaling.swegg.backend.utils.enums.UserRole;
+import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -30,7 +36,7 @@ public class JobController {
     @PostMapping("/add")
     public ResponseEntity addJob(@RequestHeader("Authorization") String token,@RequestBody JobAddRequest jobAddRequest) {
 
-        if (!securityService.canAccessRole(token, UserRole.CLIENT)) {
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
             return new ResponseEntity("User doesnt have permission",HttpStatus.UNAUTHORIZED);
         }
         Job job = jobService.addJob(jobAddRequest);
