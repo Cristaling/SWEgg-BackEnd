@@ -2,13 +2,7 @@ package io.github.cristaling.swegg.backend.core.member;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
@@ -35,6 +29,9 @@ public class MemberData {
 	private Date birthDate;
 
 	private String town;
+
+	@Lob
+	private byte[] picture;
 
 	public UUID getUuid() {
 		return uuid;
@@ -80,4 +77,12 @@ public class MemberData {
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
     }
+
+	public byte[] getPicture() {
+		return picture;
+	}
+
+	public void setPicture(byte[] picture) {
+		this.picture = picture;
+	}
 }

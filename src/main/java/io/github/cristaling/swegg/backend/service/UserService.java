@@ -2,7 +2,9 @@ package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.member.MemberData;
+import io.github.cristaling.swegg.backend.repositories.UserDataRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.web.requests.UpdateProfileRequest;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,12 +12,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
     private UserRepository userRepository;
-    private SecurityService securityService;
-
+    private UserDataRepository userDataRepository;
     @Autowired
-    public UserService(UserRepository userRepository, SecurityService securityService) {
+    public UserService(UserRepository userRepository, UserDataRepository userDataRepository) {
         this.userRepository = userRepository;
-        this.securityService = securityService;
+        this.userDataRepository = userDataRepository;
     }
 
     /**
@@ -42,5 +43,34 @@ public class UserService {
             return profileResponse;
         }
         return profileResponse;
+    }
+
+    public ProfileResponse updateProfile(UpdateProfileRequest profileRequest, Member userByToken) {
+        Member user = userRepository.getMemberByEmail(profileRequest.getEmail());
+        if(user==null){
+            return null;
+        }
+        if(!userByToken.getEmail().equals(profileRequest.getEmail())){
+            return null;
+        }
+
+        MemberData userDataUpdated=userDataRepository.getByMember(user);
+        userDataUpdated.setBirthDate(profileRequest.getBirthDate());
+        userDataUpdated.setFirstName(profileRequest.getFirstName());
+        userDataUpdated.setLastName(profileRequest.getLastName());
+        userDataUpdated.setTown(profileRequest.getTown());
+
+        userDataRepository.save(userDataUpdated);
+        userDataRepository.flush();
+
+        ProfileResponse profileResponse = new ProfileResponse();
+        profileResponse.setEmail(user.getEmail());
+        profileResponse.setBirthDate(profileRequest.getBirthDate());
+        profileResponse.setFirstName(profileRequest.getFirstName());
+        profileResponse.setLastName(profileRequest.getLastName());
+        profileResponse.setTown(profileRequest.getTown());
+
+        return profileResponse;
+
     }
 }
