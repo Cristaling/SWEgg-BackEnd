@@ -6,10 +6,14 @@ import io.github.cristaling.swegg.backend.service.UserService;
 import io.github.cristaling.swegg.backend.web.requests.UpdateProfileRequest;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @CrossOrigin
 @RestController
@@ -41,12 +45,26 @@ public class UserController {
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/uploadFile")
-    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, String email, @RequestHeader("Authorization") String token) {
+    @PatchMapping("/")
+    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file,@RequestParam String email, @RequestHeader("Authorization") String token) {
+        Member userByToken = null;
+        if (!token.equals("")) {
+            userByToken = securityService.getUserByToken(token);
+        }
+
+        if (userByToken == null) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        try {
+            boolean result=userService.uploadPhoto(file,email,userByToken);
+        } catch (IOException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @PostMapping("/")
+    @PutMapping("/")
     public ResponseEntity updateProfile(@RequestBody UpdateProfileRequest profileRequest, @RequestHeader("Authorization") String token) {
         Member userByToken = null;
         if (!token.equals("")) {
@@ -63,5 +81,21 @@ public class UserController {
         }
         return new ResponseEntity(profileResponse, HttpStatus.OK);
 
+    }
+
+    @GetMapping("/profile-picture")
+    public ResponseEntity getProfilePicture(@RequestParam String email, @RequestHeader("Authorization") String token) throws IOException {
+        Member userByToken = null;
+        if (!token.equals("")) {
+            userByToken = securityService.getUserByToken(token);
+        }
+
+        if (userByToken == null) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "profilepicture" + "\"")
+                .body(userService.getPic(email,userByToken));
     }
 }

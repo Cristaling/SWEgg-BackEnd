@@ -30,7 +30,6 @@ public class MemberData {
 
 	private String town;
 
-	@Lob
 	private byte[] picture;
 
 	public UUID getUuid() {

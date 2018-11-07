@@ -8,6 +8,10 @@ import io.github.cristaling.swegg.backend.web.requests.UpdateProfileRequest;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.transaction.Transactional;
+import java.io.IOException;
 
 @Service
 public class UserService {
@@ -54,7 +58,7 @@ public class UserService {
             return null;
         }
 
-        MemberData userDataUpdated=userDataRepository.getByMember(user);
+        MemberData userDataUpdated=user.getMemberData();
         userDataUpdated.setBirthDate(profileRequest.getBirthDate());
         userDataUpdated.setFirstName(profileRequest.getFirstName());
         userDataUpdated.setLastName(profileRequest.getLastName());
@@ -71,6 +75,31 @@ public class UserService {
         profileResponse.setTown(profileRequest.getTown());
 
         return profileResponse;
+    }
 
+    @Transactional
+    public boolean uploadPhoto(MultipartFile file, String email,Member userByToken) throws IOException {
+        Member user = userRepository.getMemberByEmail(email);
+        if(user==null){
+            return false;
+        }
+        if(!userByToken.getEmail().equals(email)){
+            return false;
+        }
+        MemberData memberData = user.getMemberData();
+        memberData.setPicture(file.getBytes());
+        userDataRepository.save(memberData);
+        return true;
+    }
+
+    public byte[] getPic(String email, Member userByToken){
+        Member user = userRepository.getMemberByEmail(email);
+        if(user==null){
+            return null;
+        }
+        if(!userByToken.getEmail().equals(email)){
+            return null;
+        }
+        return user.getMemberData().getPicture();
     }
 }
