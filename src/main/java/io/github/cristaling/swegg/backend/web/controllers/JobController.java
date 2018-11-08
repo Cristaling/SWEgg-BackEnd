@@ -2,6 +2,7 @@ package io.github.cristaling.swegg.backend.web.controllers;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.service.JobService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -38,7 +40,7 @@ public class JobController {
     public ResponseEntity addJob(@RequestHeader("Authorization") String token, @RequestBody JobAddRequest jobAddRequest) {
 
         if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
-            return new ResponseEntity("User doesnt have permission", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
         Member userByToken = securityService.getUserByToken(token);
 
@@ -52,9 +54,32 @@ public class JobController {
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public List<Job> getAllApplications() {
-        return jobService.getAll();
+    @GetMapping("/summaries")
+    public ResponseEntity getJobSummaries(@RequestHeader("Authorization") String token) {
+
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        List<JobSummary> summaries = this.jobService.getJobSummaries();
+
+        return new ResponseEntity(summaries, HttpStatus.OK);
+    }
+
+    @GetMapping()
+    public ResponseEntity getJob(@RequestHeader("Authorization") String token, String jobUUID) {
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        UUID uuid = UUID.fromString(jobUUID);
+        Job job = this.jobService.getJob(uuid);
+
+        if (job == null) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity(this.jobService.getJob(uuid), HttpStatus.OK);
     }
 
 }

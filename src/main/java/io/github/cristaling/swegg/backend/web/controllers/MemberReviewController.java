@@ -6,10 +6,13 @@ import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.AddReviewRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin
 @RestController
@@ -26,7 +29,7 @@ public class MemberReviewController {
     }
 
     @RequestMapping("/add")
-    public ResponseEntity addReview(@RequestHeader("token") String token, @RequestBody AddReviewRequest addReviewRequest){
+    public ResponseEntity addReview(@RequestHeader("Authorization") String token, @RequestBody AddReviewRequest addReviewRequest){
         if (!this.securityService.canAccessRole(token, MemberRole.CLIENT)) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }

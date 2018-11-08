@@ -25,7 +25,7 @@ public class ExampleController {
 	}
 
 	@RequestMapping("/test")
-	public ResponseEntity testLogin(@RequestHeader("token") String token, @RequestBody Member request) {
+	public ResponseEntity testLogin(@RequestHeader("Authorization") String token, @RequestBody Member request) {
 		if (!this.securityService.canAccessRole(token, MemberRole.PROVIDER)) {
 			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
