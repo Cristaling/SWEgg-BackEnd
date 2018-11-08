@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @PatchMapping("/")
-    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file,@RequestParam String email, @RequestHeader("Authorization") String token) {
+    public ResponseEntity uploadProfilePicture(@RequestParam("file") MultipartFile file, @RequestParam("email") String email, @RequestHeader("Authorization") String token) {
         Member userByToken = null;
         if (!token.equals("")) {
             userByToken = securityService.getUserByToken(token);
@@ -94,6 +94,10 @@ public class UserController {
         if (userByToken == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity(Base64.getEncoder().withoutPadding().encodeToString(userService.getPic(email,userByToken)), HttpStatus.OK);
+        byte[] profilePicture= userService.getPic(email,userByToken);
+        if(profilePicture == null){
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity(Base64.getEncoder().withoutPadding().encodeToString(profilePicture), HttpStatus.OK);
     }
 }
