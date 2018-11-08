@@ -34,7 +34,7 @@ public class JobApplicationController {
         this.securityService = securityService;
     }
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity addJobApplication(@RequestHeader("Authorization") String token, @RequestBody JobApplicationAddRequest jobApplicationAddRequest) {
 
         if (!securityService.canAccessRole(token, MemberRole.PROVIDER)) {

@@ -1,6 +1,7 @@
 package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
+import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,14 @@ public class JobService {
         this.jobRepository = jobRepository;
     }
 
-    public Job addJob(JobAddRequest jobAddRequest) {
+    public Job addJob(JobAddRequest jobAddRequest, Member member) {
 
-        if (jobRepository.getJobByOwnerAndJobStatus(jobAddRequest.getOwner(), jobAddRequest.getJobStatus()) != null) {
+        if (jobRepository.getJobByOwnerAndJobStatus(member, jobAddRequest.getJobStatus()) != null) {
             return null;
         }
         Job job = new Job();
         job.setJobStatus(jobAddRequest.getJobStatus());
-        job.setOwner(jobAddRequest.getOwner());
+        job.setOwner(member);
         job.setJobType(jobAddRequest.getJobType());
         jobRepository.save(job);
         jobRepository.flush();

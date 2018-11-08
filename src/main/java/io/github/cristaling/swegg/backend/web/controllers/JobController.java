@@ -1,6 +1,7 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
+import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.service.JobService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
@@ -33,16 +34,20 @@ public class JobController {
         this.securityService = securityService;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity addJob(@RequestHeader("Authorization") String token,@RequestBody JobAddRequest jobAddRequest) {
+    @PostMapping
+    public ResponseEntity addJob(@RequestHeader("Authorization") String token, @RequestBody JobAddRequest jobAddRequest) {
 
         if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
-            return new ResponseEntity("User doesnt have permission",HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity("User doesnt have permission", HttpStatus.UNAUTHORIZED);
         }
-        Job job = jobService.addJob(jobAddRequest);
+        Member userByToken = securityService.getUserByToken(token);
+
+        Job job = jobService.addJob(jobAddRequest, userByToken);
+
+        System.out.println(jobAddRequest.toString());
 
         if (job == null) {
-            return new ResponseEntity("Job from this Owner with this status already exists", HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity("Job from this Owner with this status already exists", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.CREATED);
     }
