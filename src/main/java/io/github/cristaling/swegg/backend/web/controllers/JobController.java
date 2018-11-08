@@ -1,6 +1,7 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
+import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.service.JobService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
@@ -23,33 +24,45 @@ import java.util.List;
 @RequestMapping("/api/job")
 public class JobController {
 
-    private JobService jobService;
+	private JobService jobService;
 
-    private SecurityService securityService;
+	private SecurityService securityService;
 
-    @Autowired
-    public JobController(JobService jobService, SecurityService securityService) {
-        this.jobService = jobService;
-        this.securityService = securityService;
-    }
+	@Autowired
+	public JobController(JobService jobService, SecurityService securityService) {
+		this.jobService = jobService;
+		this.securityService = securityService;
+	}
 
-    @PostMapping("/add")
-    public ResponseEntity addJob(@RequestHeader("Authorization") String token,@RequestBody JobAddRequest jobAddRequest) {
+	@PostMapping("/add")
+	public ResponseEntity addJob(@RequestHeader("Authorization") String token, @RequestBody JobAddRequest jobAddRequest) {
 
-        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
-            return new ResponseEntity("User doesnt have permission",HttpStatus.UNAUTHORIZED);
-        }
-        Job job = jobService.addJob(jobAddRequest);
+		if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+		}
+		Job job = jobService.addJob(jobAddRequest);
 
-        if (job == null) {
-            return new ResponseEntity("Job from this Owner with this status already exists", HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(HttpStatus.CREATED);
-    }
+		if (job == null) {
+			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity(HttpStatus.CREATED);
+	}
 
-    @GetMapping
-    public List<Job> getAllApplications() {
-        return jobService.getAll();
-    }
+	@GetMapping("/summaries")
+	public ResponseEntity getJobSummaries(@RequestHeader("Authorization") String token) {
+
+		if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+		}
+
+		List<JobSummary> summaries = this.jobService.getJobSummaries();
+
+		return new ResponseEntity(summaries, HttpStatus.OK);
+	}
+
+	@GetMapping
+	public List<Job> getAllApplications() {
+		return jobService.getAll();
+	}
 
 }
