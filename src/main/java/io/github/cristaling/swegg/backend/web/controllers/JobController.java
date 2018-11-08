@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -60,9 +61,15 @@ public class JobController {
 		return new ResponseEntity(summaries, HttpStatus.OK);
 	}
 
-	@GetMapping
-	public List<Job> getAllApplications() {
-		return jobService.getAll();
+	@GetMapping()
+	public ResponseEntity getJob(@RequestHeader("Authorization") String token, String jobUUID) {
+		if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+		}
+
+		UUID uuid = UUID.fromString(jobUUID);
+
+		return new ResponseEntity(this.jobService.getJob(uuid), HttpStatus.OK);
 	}
 
 }
