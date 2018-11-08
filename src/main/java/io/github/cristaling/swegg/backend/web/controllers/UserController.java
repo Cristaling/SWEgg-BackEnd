@@ -56,13 +56,21 @@ public class UserController {
         if (userByToken == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-
+        boolean result=false;
         try {
-            boolean result=userService.uploadPhoto(file,email,userByToken);
+           result=userService.uploadPhoto(file,email,userByToken);
         } catch (IOException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(HttpStatus.OK);
+        if(result==false){
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        try {
+            return new ResponseEntity(Base64.getEncoder().withoutPadding().encodeToString(file.getBytes()), HttpStatus.OK);
+        } catch (IOException e) {
+            return  new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
     }
 
     @PutMapping("/")
@@ -81,6 +89,7 @@ public class UserController {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
         return new ResponseEntity(profileResponse, HttpStatus.OK);
+
 
     }
 
