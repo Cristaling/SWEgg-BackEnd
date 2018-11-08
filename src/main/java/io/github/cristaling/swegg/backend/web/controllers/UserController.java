@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Base64;
 
 @CrossOrigin
 @RestController
@@ -84,7 +85,7 @@ public class UserController {
     }
 
     @GetMapping("/profile-picture")
-    public ResponseEntity getProfilePicture(@RequestParam String email, @RequestHeader("Authorization") String token) throws IOException {
+    public ResponseEntity getProfilePicture(String email, @RequestHeader("Authorization") String token) throws IOException {
         Member userByToken = null;
         if (!token.equals("")) {
             userByToken = securityService.getUserByToken(token);
@@ -93,9 +94,6 @@ public class UserController {
         if (userByToken == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "profilepicture" + "\"")
-                .body(userService.getPic(email,userByToken));
+        return new ResponseEntity(Base64.getEncoder().withoutPadding().encodeToString(userService.getPic(email,userByToken)), HttpStatus.OK);
     }
 }
