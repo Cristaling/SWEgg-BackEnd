@@ -68,6 +68,11 @@ public class JobController {
 		}
 
 		UUID uuid = UUID.fromString(jobUUID);
+		Job job = this.jobService.getJob(uuid);
+
+		if (job == null) {
+			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		}
 
 		return new ResponseEntity(this.jobService.getJob(uuid), HttpStatus.OK);
 	}
