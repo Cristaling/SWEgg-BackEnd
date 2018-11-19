@@ -2,20 +2,25 @@ package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.member.MemberData;
+import io.github.cristaling.swegg.backend.repositories.UserDataRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.web.requests.UpdateProfileRequest;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.transaction.Transactional;
+import java.io.IOException;
 
 @Service
 public class UserService {
     private UserRepository userRepository;
-    private SecurityService securityService;
-
+    private UserDataRepository userDataRepository;
     @Autowired
-    public UserService(UserRepository userRepository, SecurityService securityService) {
+    public UserService(UserRepository userRepository, UserDataRepository userDataRepository) {
         this.userRepository = userRepository;
-        this.securityService = securityService;
+        this.userDataRepository = userDataRepository;
     }
 
     /**
@@ -42,5 +47,59 @@ public class UserService {
             return profileResponse;
         }
         return profileResponse;
+    }
+
+    public ProfileResponse updateProfile(UpdateProfileRequest profileRequest, Member userByToken) {
+        Member user = userRepository.getMemberByEmail(profileRequest.getEmail());
+        if(user==null){
+            return null;
+        }
+        if(!userByToken.getEmail().equals(profileRequest.getEmail())){
+            return null;
+        }
+
+        MemberData userDataUpdated=user.getMemberData();
+        userDataUpdated.setBirthDate(profileRequest.getBirthDate());
+        userDataUpdated.setFirstName(profileRequest.getFirstName());
+        userDataUpdated.setLastName(profileRequest.getLastName());
+        userDataUpdated.setTown(profileRequest.getTown());
+
+        userDataRepository.save(userDataUpdated);
+        userDataRepository.flush();
+
+        ProfileResponse profileResponse = new ProfileResponse();
+        profileResponse.setEmail(user.getEmail());
+        profileResponse.setBirthDate(profileRequest.getBirthDate());
+        profileResponse.setFirstName(profileRequest.getFirstName());
+        profileResponse.setLastName(profileRequest.getLastName());
+        profileResponse.setTown(profileRequest.getTown());
+
+        return profileResponse;
+    }
+
+    @Transactional
+    public boolean uploadPhoto(MultipartFile file, String email,Member userByToken) throws IOException {
+        Member user = userRepository.getMemberByEmail(email);
+        if(user==null){
+            return false;
+        }
+        if(!userByToken.getEmail().equals(email)){
+            return false;
+        }
+        MemberData memberData = user.getMemberData();
+        memberData.setPicture(file.getBytes());
+        userDataRepository.save(memberData);
+        return true;
+    }
+
+    public byte[] getPic(String email, Member userByToken){
+        Member user = userRepository.getMemberByEmail(email);
+        if(user==null){
+            return null;
+        }
+        if(!userByToken.getEmail().equals(email)){
+            return null;
+        }
+        return user.getMemberData().getPicture();
     }
 }
