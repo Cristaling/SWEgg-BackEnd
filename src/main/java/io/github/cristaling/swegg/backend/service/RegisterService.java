@@ -4,6 +4,7 @@ import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.member.MemberData;
 import io.github.cristaling.swegg.backend.repositories.UserDataRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class RegisterService {
         member.setEmail(registerRequest.getEmail());
         member.setPassword(registerRequest.getPassword());
         member.setMemberData(memberData);
+        member.setRole(MemberRole.CLIENT);
         memberData.setMember(member);
         userRepository.save(member);
         userRepository.flush();

@@ -1,5 +1,6 @@
 package io.github.cristaling.swegg.backend.core.job;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
@@ -28,6 +29,7 @@ public class Job {
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
 	@JoinColumn(name = "user_uuid", nullable = false)
+	@JsonIgnore
 	private Member owner;
 
 	@Enumerated(EnumType.STRING)

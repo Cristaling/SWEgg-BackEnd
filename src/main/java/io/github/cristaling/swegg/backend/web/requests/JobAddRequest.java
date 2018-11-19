@@ -6,8 +6,6 @@ import io.github.cristaling.swegg.backend.utils.enums.JobType;
 
 public class JobAddRequest {
 
-    private Member owner;
-
     private JobType jobType;
 
     private JobStatus jobStatus;
@@ -16,20 +14,14 @@ public class JobAddRequest {
 
     private String description;
 
-    public JobAddRequest(Member owner, JobType jobType, JobStatus jobStatus, String title, String description) {
-        this.owner = owner;
+    public JobAddRequest() {
+    }
+
+    public JobAddRequest(JobType jobType, JobStatus jobStatus, String title, String description) {
         this.jobType = jobType;
         this.jobStatus = jobStatus;
         this.title = title;
         this.description = description;
-    }
-
-    public Member getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Member owner) {
-        this.owner = owner;
     }
 
     public JobType getJobType() {

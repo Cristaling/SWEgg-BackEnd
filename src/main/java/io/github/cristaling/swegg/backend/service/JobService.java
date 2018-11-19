@@ -22,14 +22,14 @@ public class JobService {
         this.jobRepository = jobRepository;
     }
 
-    public Job addJob(JobAddRequest jobAddRequest) {
+    public Job addJob(JobAddRequest jobAddRequest, Member member) {
 
-        if (jobRepository.getJobByOwnerAndJobStatus(jobAddRequest.getOwner(), jobAddRequest.getJobStatus()) != null) {
+        if (jobRepository.getJobByOwnerAndJobStatus(member, jobAddRequest.getJobStatus()) != null) {
             return null;
         }
         Job job = new Job();
         job.setJobStatus(jobAddRequest.getJobStatus());
-        job.setOwner(jobAddRequest.getOwner());
+        job.setOwner(member);
         job.setJobType(jobAddRequest.getJobType());
         jobRepository.save(job);
         jobRepository.flush();
