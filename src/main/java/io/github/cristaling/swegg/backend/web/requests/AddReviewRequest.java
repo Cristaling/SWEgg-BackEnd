@@ -10,6 +10,8 @@ public class AddReviewRequest {
     private String text;
     private int stars;
 
+    public AddReviewRequest(){}
+
     public AddReviewRequest(String reviewedEmail, String text, int stars) {
         this.reviewedEmail = reviewedEmail;
         this.text = text;

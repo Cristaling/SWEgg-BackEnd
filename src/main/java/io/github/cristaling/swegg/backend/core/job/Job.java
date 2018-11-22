@@ -32,8 +32,8 @@ public class Job {
 	@JsonIgnore
 	private Member owner;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "employee_uuid", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "employee_uuid")
     @JsonIgnore
     private Member employee;
 

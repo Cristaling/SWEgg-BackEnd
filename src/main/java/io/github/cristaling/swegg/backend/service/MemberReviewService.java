@@ -31,6 +31,10 @@ public class MemberReviewService {
         if(reviewed == null){
             return null;
         }
+        MemberReview review = this.memberReviewRepository.getMemberReviewByReviewerAndReviewed(reviewer,reviewed);
+        if(review != null){
+            return null;
+        }
         Job job = this.jobRepository.getJobByOwnerAndEmployee(reviewer, reviewed);
         if(job == null){
             return null;
