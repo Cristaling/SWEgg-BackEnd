@@ -1,5 +1,6 @@
 package io.github.cristaling.swegg.backend.core.member;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -17,9 +18,11 @@ public class MemberReview {
     private UUID uuid;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+    @JsonIgnore
     private Member reviewer;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+    @JsonIgnore
     private Member reviewed;
 
     @NotNull

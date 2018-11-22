@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface JobRepository extends JpaRepository<Job, UUID> {
-    Job getJobByOwnerAndJobStatus(Member Owner, JobStatus jobStatus);
+    Job getJobByOwnerAndJobStatus(Member owner, JobStatus jobStatus);
+    Job getJobByOwnerAndEmployee(Member owner, Member employee);
 }
