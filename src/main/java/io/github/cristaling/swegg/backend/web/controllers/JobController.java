@@ -5,6 +5,7 @@ import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.service.JobService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
+import io.github.cristaling.swegg.backend.utils.enums.JobType;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,11 @@ public class JobController {
         }
 
         return new ResponseEntity(this.jobService.getJob(uuid), HttpStatus.OK);
+    }
+
+    @GetMapping("/types")
+    public JobType[] getJobTypes(){
+        return JobType.values();
     }
 
 }

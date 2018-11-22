@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
+import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.CascadeType;
@@ -22,67 +23,85 @@ import java.util.UUID;
 @Table(name = "jobs")
 public class Job {
 
-	@Id
-	@GeneratedValue(generator = "UUID")
-	@GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-	private UUID uuid;
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    private UUID uuid;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
-	@JoinColumn(name = "user_uuid", nullable = false)
-	@JsonIgnore
-	private Member owner;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "user_uuid", nullable = false)
+    @JsonIgnore
+    private Member owner;
 
-	@Enumerated(EnumType.STRING)
-	private JobType jobType;
+    @Enumerated(EnumType.STRING)
+    private JobType jobType;
 
-	@Enumerated(EnumType.STRING)
-	private JobStatus jobStatus;
+    @Enumerated(EnumType.STRING)
+    private JobStatus jobStatus;
 
-	private String title;
+    private String title;
 
-	private String description;
+    private String description;
 
-	public UUID getUuid() {
-		return uuid;
-	}
+    public Job() {
+    }
 
-	public Member getOwner() {
-		return owner;
-	}
+    public Job(Member owner, JobType jobType, JobStatus jobStatus, String title, String description) {
+        this.owner = owner;
+        this.jobType = jobType;
+        this.jobStatus = jobStatus;
+        this.title = title;
+        this.description = description;
+    }
 
-	public void setOwner(Member owner) {
-		this.owner = owner;
-	}
+    public Job(JobAddRequest jobAddRequest) {
+        this.jobType = jobAddRequest.getJobType();
+        this.jobStatus = jobAddRequest.getJobStatus();
+        this.title = jobAddRequest.getTitle();
+        this.description = jobAddRequest.getDescription();
+    }
 
-	public JobType getJobType() {
-		return jobType;
-	}
+    public UUID getUuid() {
+        return uuid;
+    }
 
-	public void setJobType(JobType jobType) {
-		this.jobType = jobType;
-	}
+    public Member getOwner() {
+        return owner;
+    }
 
-	public JobStatus getJobStatus() {
-		return jobStatus;
-	}
+    public void setOwner(Member owner) {
+        this.owner = owner;
+    }
 
-	public void setJobStatus(JobStatus jobStatus) {
-		this.jobStatus = jobStatus;
-	}
+    public JobType getJobType() {
+        return jobType;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public void setJobType(JobType jobType) {
+        this.jobType = jobType;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public JobStatus getJobStatus() {
+        return jobStatus;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setJobStatus(JobStatus jobStatus) {
+        this.jobStatus = jobStatus;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

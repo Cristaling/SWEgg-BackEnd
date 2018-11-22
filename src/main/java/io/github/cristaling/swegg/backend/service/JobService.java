@@ -27,10 +27,8 @@ public class JobService {
         if (jobRepository.getJobByOwnerAndJobStatus(member, jobAddRequest.getJobStatus()) != null) {
             return null;
         }
-        Job job = new Job();
-        job.setJobStatus(jobAddRequest.getJobStatus());
+        Job job = new Job(jobAddRequest);
         job.setOwner(member);
-        job.setJobType(jobAddRequest.getJobType());
         jobRepository.save(job);
         jobRepository.flush();
 
