@@ -7,6 +7,7 @@ import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.service.JobApplicationService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
+import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.requests.JobApplicationAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,12 +34,13 @@ public class JobApplicationController {
     }
 
     @PostMapping
-    public ResponseEntity addJobApplication(@RequestHeader("Authorization") String token, @RequestParam Job job) {
+    public ResponseEntity addJobApplication(@RequestHeader("Authorization") String token, @RequestParam JobAddRequest jobAddRequest) {
 
         if (!securityService.canAccessRole(token, MemberRole.PROVIDER)) {
             return new ResponseEntity("Member doesnt have permission", HttpStatus.UNAUTHORIZED);
         }
         Member member = securityService.getUserByToken(token);
+        Job job=new Job(jobAddRequest);
         JobApplicationAddRequest jobApplicationAddRequest = new JobApplicationAddRequest(member, job);
         JobApplication jobApplication = this.jobApplicationService.addJobApplication(jobApplicationAddRequest);
 

@@ -1,21 +1,24 @@
 package io.github.cristaling.swegg.backend.utils.enums;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum JobType {
 
     SINGLE("Single"),
     RECURRENT("Recurrent");
 
-    String name;
+    String value;
 
-    JobType(String name) {
-        this.name = name;
+    JobType(String value) {
+        this.value = value;
     }
 
-    public String getName() {
-        return name;
+    public String getValue() {
+        return value;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setValue(String value) {
+        this.value = value;
     }
 }

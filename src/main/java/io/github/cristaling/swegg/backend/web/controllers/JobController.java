@@ -84,8 +84,8 @@ public class JobController {
     }
 
     @GetMapping("/types")
-    public JobType[] getJobTypes(){
-        return JobType.values();
+    public ResponseEntity getJobTypes(){
+        return new ResponseEntity(JobType.values(), HttpStatus.OK);
     }
 
 }
