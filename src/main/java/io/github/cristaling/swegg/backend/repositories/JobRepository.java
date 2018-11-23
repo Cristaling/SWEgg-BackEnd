@@ -10,4 +10,5 @@ import java.util.UUID;
 
 public interface JobRepository extends JpaRepository<Job, UUID> {
     List<Job> getJobsByOwnerAndJobStatus(Member Owner, JobStatus jobStatus);
+    Job getJobByOwnerAndEmployee(Member owner, Member employee);
 }

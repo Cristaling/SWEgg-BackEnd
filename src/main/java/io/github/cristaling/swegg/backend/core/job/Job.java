@@ -33,8 +33,13 @@ public class Job {
     @JsonIgnore
     private Member owner;
 
-    @Enumerated(EnumType.STRING)
-    private JobType jobType;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "employee_uuid")
+    @JsonIgnore
+    private Member employee;
+
+	@Enumerated(EnumType.STRING)
+	private JobType jobType;
 
     @Enumerated(EnumType.STRING)
     private JobStatus jobStatus;
@@ -64,6 +69,10 @@ public class Job {
     public UUID getUuid() {
         return uuid;
     }
+    
+    public Member getEmployee() { return employee; }
+
+    public void setEmployee(Member employee) { this.employee = employee; }
 
     public Member getOwner() {
         return owner;
