@@ -69,7 +69,7 @@ public class Job {
     public UUID getUuid() {
         return uuid;
     }
-    
+
     public Member getEmployee() { return employee; }
 
     public void setEmployee(Member employee) { this.employee = employee; }
