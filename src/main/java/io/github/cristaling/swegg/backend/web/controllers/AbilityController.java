@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/api/ability")
@@ -30,6 +33,26 @@ public class AbilityController {
 	}
 
 	@GetMapping
+	public ResponseEntity getAllAbilities() {
+		return new ResponseEntity(this.abilityService.getAbilitiesByCategory("General")
+				.stream()
+				.map((Ability::getName))
+				.collect(Collectors.toList()), HttpStatus.OK);
+	}
+
+	@RequestMapping("/add")
+	public ResponseEntity addAbilities(@RequestHeader("Authorization") String token,
+	                                   @RequestBody List<String> abilities) {
+		if (!this.securityService.canAccessRole(token, MemberRole.PROVIDER)) {
+			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+		}
+		for (String ability : abilities) {
+			this.abilityService.addAbility(ability, "General");
+		}
+		return new ResponseEntity(HttpStatus.OK);
+	}
+
+	@RequestMapping("/endorsements")
 	public ResponseEntity getEndorsements(@RequestHeader("Authorization") String token,
 	                                      @RequestParam String email) {
 		if (!this.securityService.canAccessRole(token, MemberRole.PROVIDER)) {

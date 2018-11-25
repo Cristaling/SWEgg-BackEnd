@@ -69,7 +69,19 @@ public class AbilityService {
 	}
 
 	public Ability addAbility(String name, String category) {
-		Ability ability = new Ability();
+
+		Ability ability;
+
+		try {
+			ability = this.abilityRepository.getAbilityByName(name);
+			if (ability != null) {
+				return null;
+			}
+		} catch (EntityNotFoundException ex ){
+
+		}
+
+		ability = new Ability();
 		ability.setName(name);
 		ability.setCategory(category);
 		this.abilityRepository.save(ability);
