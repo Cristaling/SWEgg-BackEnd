@@ -44,7 +44,7 @@ public class JobService {
 
     public List<JobSummary> getJobSummaries(int page, int count) {
         List<Job> jobs;
-        if (page < 1) {
+        if (page < 0) {
             jobs = this.jobRepository.findAll();
         } else {
             jobs = this.jobRepository.findAll(PageRequest.of(page, count)).getContent();
