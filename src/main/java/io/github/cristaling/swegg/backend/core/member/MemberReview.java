@@ -21,7 +21,7 @@ public class MemberReview {
     @JsonIgnore
     private Member reviewer;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     @JsonIgnore
     private Member reviewed;
 
