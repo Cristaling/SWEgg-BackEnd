@@ -30,9 +30,6 @@ public class AbilityController {
 	public AbilityController(SecurityService securityService, AbilityService abilityService) {
 		this.securityService = securityService;
 		this.abilityService = abilityService;
-		for (int i =1;i<1000;i++) {
-			this.abilityService.addAbility("c"+i+"bc", "General");
-		}
 	}
 
 	@GetMapping
