@@ -9,6 +9,7 @@ import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -47,8 +48,13 @@ public class JobService {
         return jobRepository.findAll();
     }
 
-    public List<JobSummary> getJobSummaries() {
-        List<Job> jobs = this.jobRepository.findAll();
+    public List<JobSummary> getJobSummaries(int page, int count) {
+        List<Job> jobs;
+        if (page < 0) {
+            jobs = this.jobRepository.findAll();
+        } else {
+            jobs = this.jobRepository.findAll(PageRequest.of(page, count)).getContent();
+        }
         return jobs.stream().map(this::getSummary).collect(Collectors.toList());
     }
 
