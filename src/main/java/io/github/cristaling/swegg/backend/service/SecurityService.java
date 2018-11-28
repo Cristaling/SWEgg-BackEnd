@@ -62,7 +62,7 @@ public class SecurityService {
 
 		MemberRole hasRole = member.getRole();
 
-		return hasRole == MemberRole.ADMIN || hasRole == role;
+		return hasRole == MemberRole.ADMIN || hasRole == MemberRole.CLIENT || hasRole == MemberRole.PROVIDER;
 	}
 
 	/**
