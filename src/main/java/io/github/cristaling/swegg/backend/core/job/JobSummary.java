@@ -12,7 +12,13 @@ public class JobSummary {
 
 	public JobSummary() {
 	}
-
+	public JobSummary(Job job) {
+		this.uuid=job.getUuid();
+		this.description = job.getDescription();
+		this.title=job.getTitle();
+		this.ownerEmail=job.getOwner().getEmail();
+		this.ownerName=job.getOwner().getMemberData().getFirstName()+" "+job.getOwner().getMemberData().getLastName();
+	}
 	public UUID getUuid() {
 		return uuid;
 	}

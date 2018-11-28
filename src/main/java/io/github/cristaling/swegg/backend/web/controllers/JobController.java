@@ -85,4 +85,19 @@ public class JobController {
         return new ResponseEntity(this.jobService.getJob(uuid), HttpStatus.OK);
     }
 
+	@GetMapping("/related")
+	public ResponseEntity getRelatedJobs(@RequestHeader("Authorization") String token,@RequestParam("email") String email) {
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        Member userByToken =securityService.getUserByToken(token);
+        if (userByToken == null) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        List<JobSummary> jobSummaryList= jobService.getUserJobs(email,userByToken);
+        if(jobSummaryList==null){
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity(jobSummaryList,HttpStatus.OK);
+	}
 }

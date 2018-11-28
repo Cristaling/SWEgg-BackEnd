@@ -36,12 +36,7 @@ public class UserService {
             return null;
         }
         MemberData userData = user.getMemberData();
-        ProfileResponse profileResponse = new ProfileResponse();
-        profileResponse.setEmail(user.getEmail());
-        profileResponse.setBirthDate(userData.getBirthDate());
-        profileResponse.setFirstName(userData.getFirstName());
-        profileResponse.setLastName(userData.getLastName());
-        profileResponse.setTown(userData.getTown());
+        ProfileResponse profileResponse = new ProfileResponse(userData,user.getEmail());
         if (userByToken != null && userByToken.getEmail().equals(email)) {
         //TODO it will contains personal data about the user. now there are none
             return profileResponse;
@@ -67,12 +62,7 @@ public class UserService {
         userDataRepository.save(userDataUpdated);
         userDataRepository.flush();
 
-        ProfileResponse profileResponse = new ProfileResponse();
-        profileResponse.setEmail(user.getEmail());
-        profileResponse.setBirthDate(profileRequest.getBirthDate());
-        profileResponse.setFirstName(profileRequest.getFirstName());
-        profileResponse.setLastName(profileRequest.getLastName());
-        profileResponse.setTown(profileRequest.getTown());
+        ProfileResponse profileResponse = new ProfileResponse(userDataUpdated,user.getEmail());
 
         return profileResponse;
     }

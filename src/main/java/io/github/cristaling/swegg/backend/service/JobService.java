@@ -1,26 +1,32 @@
 package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
+import io.github.cristaling.swegg.backend.core.job.JobApplication;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
+import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class JobService {
 
     private JobRepository jobRepository;
+    private UserRepository userRepository;
+    private JobApplicationRepository jobApplicationRepository;
 
     @Autowired
-    public JobService(JobRepository jobRepository) {
+    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository) {
         this.jobRepository = jobRepository;
+        this.userRepository = userRepository;
+        this.jobApplicationRepository = jobApplicationRepository;
     }
 
     public Job addJob(JobAddRequest jobAddRequest, Member member) {
@@ -51,6 +57,21 @@ public class JobService {
         }
         return jobs.stream().map(this::getSummary).collect(Collectors.toList());
     }
+
+    public List<JobSummary> getUserJobs(String email, Member userByToken){
+        if(!userByToken.getEmail().equals(email)){
+            return null;
+        }
+        Member member= userRepository.getMemberByEmail(email);
+        List<Job> jobList=jobRepository.getAllJobsForUser(member.getUuid());
+        List<JobSummary> jobSummaryList= new ArrayList<>();
+        for (Job job: jobList
+             ) {
+            jobSummaryList.add(new JobSummary(job));
+        }
+        return jobSummaryList;
+    }
+
 
     private JobSummary getSummary(Job job) {
         JobSummary jobSummary = new JobSummary();
