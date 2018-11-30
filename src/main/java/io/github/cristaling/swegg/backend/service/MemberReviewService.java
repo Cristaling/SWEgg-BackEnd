@@ -2,7 +2,9 @@ package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.member.MemberData;
 import io.github.cristaling.swegg.backend.core.member.MemberReview;
+import io.github.cristaling.swegg.backend.core.member.MemberReviewSummary;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.MemberReviewRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MemberReviewService {
@@ -54,5 +58,31 @@ public class MemberReviewService {
         this.memberReviewRepository.flush();
 
         return memberReview;
+    }
+
+    public List<MemberReviewSummary> getMemberLastReviews(String email){
+        Member reviewed = this.userRepository.getMemberByEmail(email);
+        if(reviewed == null){
+            return null;
+        }
+        List<MemberReview> memberReviews = this.memberReviewRepository.findTop5ByReviewedOrderByDateGivenDesc(reviewed);
+        return memberReviews.stream().map(this::getMemberReviewSummary).collect(Collectors.toList());
+    }
+
+    private MemberReviewSummary getMemberReviewSummary(MemberReview memberReview) {
+        MemberReviewSummary memberReviewSummary = new MemberReviewSummary();
+
+        memberReviewSummary.setUuid(memberReview.getUuid());
+        memberReviewSummary.setDateGiven(memberReview.getDateGiven());
+
+        Member reviewer = memberReview.getReviewer();
+
+        memberReviewSummary.setReviewerEmail(reviewer.getEmail());
+        MemberData memberData = reviewer.getMemberData();
+        memberReviewSummary.setReviewerFirstName(memberData.getFirstName());
+        memberReviewSummary.setReviewerLastName(memberData.getLastName());
+        memberReviewSummary.setText(memberReview.getText());
+
+        return memberReviewSummary;
     }
 }

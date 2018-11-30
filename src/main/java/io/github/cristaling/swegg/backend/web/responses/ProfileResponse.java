@@ -1,5 +1,7 @@
 package io.github.cristaling.swegg.backend.web.responses;
 
+import io.github.cristaling.swegg.backend.core.member.MemberData;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -19,6 +21,14 @@ public class ProfileResponse implements Serializable {
     }
 
     public ProfileResponse() {
+    }
+
+    public ProfileResponse(MemberData memberData, String email) {
+        this.email= email;
+        this.birthDate=memberData.getBirthDate();
+        this.firstName=memberData.getFirstName();
+        this.lastName=memberData.getLastName();
+        this.town=memberData.getTown();
     }
 
     public String getEmail() {

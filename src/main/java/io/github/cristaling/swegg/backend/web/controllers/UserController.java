@@ -3,6 +3,7 @@ package io.github.cristaling.swegg.backend.web.controllers;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.service.UserService;
+import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.UpdateProfileRequest;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +37,8 @@ public class UserController {
      */
     @GetMapping("/profile")
     public ResponseEntity getProfile(String email, @RequestHeader("Authorization") String token) {
-        Member userByToken = null;
-        if (!token.equals("")) {
-            userByToken = securityService.getUserByToken(token);
-        }
+        Member userByToken = securityService.getUserByToken(token);
+
         ProfileResponse profileResponse = userService.getProfile(email, userByToken);
         if (profileResponse != null)
             return new ResponseEntity(profileResponse, HttpStatus.OK);
@@ -48,10 +47,10 @@ public class UserController {
 
     @PatchMapping("/")
     public ResponseEntity uploadProfilePicture(@RequestParam("file") MultipartFile file, @RequestParam("email") String email, @RequestHeader("Authorization") String token) {
-        Member userByToken = null;
-        if (!token.equals("")) {
-            userByToken = securityService.getUserByToken(token);
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
+        Member userByToken = securityService.getUserByToken(token);
 
         if (userByToken == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -75,11 +74,11 @@ public class UserController {
 
     @PutMapping("/")
     public ResponseEntity updateProfile(@RequestBody UpdateProfileRequest profileRequest, @RequestHeader("Authorization") String token) {
-        Member userByToken = null;
-        if (!token.equals("")) {
-            userByToken = securityService.getUserByToken(token);
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
 
+        Member userByToken =securityService.getUserByToken(token);
         if (userByToken == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
@@ -95,10 +94,10 @@ public class UserController {
 
     @GetMapping("/profile-picture")
     public ResponseEntity getProfilePicture(String email, @RequestHeader("Authorization") String token) throws IOException {
-        Member userByToken = null;
-        if (!token.equals("")) {
-            userByToken = securityService.getUserByToken(token);
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
+        Member userByToken= securityService.getUserByToken(token);
 
         if (userByToken == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -54,13 +55,15 @@ public class JobController {
     }
 
     @GetMapping("/summaries")
-    public ResponseEntity getJobSummaries(@RequestHeader("Authorization") String token) {
+    public ResponseEntity getJobSummaries(@RequestHeader("Authorization") String token,
+                                          @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int count) {
 
         if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
 
-        List<JobSummary> summaries = this.jobService.getJobSummaries();
+        List<JobSummary> summaries = this.jobService.getJobSummaries(page, count);
 
         return new ResponseEntity(summaries, HttpStatus.OK);
     }
@@ -86,4 +89,19 @@ public class JobController {
         return new ResponseEntity(JobType.values(), HttpStatus.OK);
     }
 
+	@GetMapping("/related")
+	public ResponseEntity getRelatedJobs(@RequestHeader("Authorization") String token,@RequestParam("email") String email) {
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        Member userByToken =securityService.getUserByToken(token);
+        if (userByToken == null) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        List<JobSummary> jobSummaryList= jobService.getUserJobs(email,userByToken);
+        if(jobSummaryList==null){
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity(jobSummaryList,HttpStatus.OK);
+	}
 }
