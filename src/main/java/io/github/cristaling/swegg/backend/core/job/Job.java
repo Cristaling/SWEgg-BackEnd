@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
@@ -44,8 +45,10 @@ public class Job {
     @Enumerated(EnumType.STRING)
     private JobStatus jobStatus;
 
+    @NotNull
     private String title;
 
+    @NotNull
     private String description;
 
     public Job() {

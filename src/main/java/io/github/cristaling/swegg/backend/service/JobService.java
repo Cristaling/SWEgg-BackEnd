@@ -27,6 +27,9 @@ public class JobService {
         if (jobRepository.getJobsByOwnerAndJobStatus(member, jobAddRequest.getJobStatus()).size() >7) {
             return null;
         }
+        if(jobAddRequest.getTitle().length() < 5 || jobAddRequest.getDescription().length() < 5){
+            return null;
+        }
         Job job = new Job(jobAddRequest);
         job.setOwner(member);
         jobRepository.save(job);

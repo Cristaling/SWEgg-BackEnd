@@ -47,10 +47,8 @@ public class JobController {
 
         Job job = jobService.addJob(jobAddRequest, userByToken);
 
-        System.out.println(jobAddRequest.toString());
-
         if (job == null) {
-            //return new ResponseEntity("Job from this Owner with this status already exists", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Job should have all it's fields entered.", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.CREATED);
     }
