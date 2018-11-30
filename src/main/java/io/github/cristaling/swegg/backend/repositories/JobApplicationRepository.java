@@ -14,5 +14,6 @@ import java.util.UUID;
 @Repository
 public interface JobApplicationRepository extends JpaRepository<JobApplication, UUID> {
     JobApplication getJobApplicationByApplicantAndJob(Member member, Job job);
-    List<JobApplication> getAllByApplicant(Member member);
+    List<JobApplication> getJobApplicationsByApplicant(Member member);
+    List<JobApplication> getJobApplicationsByJob(Job job);
 }

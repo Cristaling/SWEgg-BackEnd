@@ -1,23 +1,22 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
 
+import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobApplication;
+import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.service.JobApplicationService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
+import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.requests.JobApplicationAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -35,11 +34,14 @@ public class JobApplicationController {
     }
 
     @PostMapping
-    public ResponseEntity addJobApplication(@RequestHeader("Authorization") String token, @RequestBody JobApplicationAddRequest jobApplicationAddRequest) {
+    public ResponseEntity addJobApplication(@RequestHeader("Authorization") String token, @RequestParam JobAddRequest jobAddRequest) {
 
         if (!securityService.canAccessRole(token, MemberRole.PROVIDER)) {
             return new ResponseEntity("Member doesnt have permission", HttpStatus.UNAUTHORIZED);
         }
+        Member member = securityService.getUserByToken(token);
+        Job job=new Job(jobAddRequest);
+        JobApplicationAddRequest jobApplicationAddRequest = new JobApplicationAddRequest(member, job);
         JobApplication jobApplication = this.jobApplicationService.addJobApplication(jobApplicationAddRequest);
 
         if (jobApplication == null) {
@@ -49,8 +51,27 @@ public class JobApplicationController {
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public List<JobApplication> getAllApplications() {
-        return jobApplicationService.getAll();
+    @GetMapping(value = "/getByParticipant/{email}")
+    public List<JobApplicationAddRequest> getApplicationsForParticipantEmail(@PathVariable String email) {
+        List<JobApplication> jobApplications;
+        List<JobApplicationAddRequest> jobApplicationAddRequests = new ArrayList<>();
+        jobApplications = jobApplicationService.getApplicationsForApplicant(email);
+        for (JobApplication jobApplication : jobApplications) {
+            JobApplicationAddRequest jobApplicationAddRequest = new JobApplicationAddRequest(jobApplication);
+            jobApplicationAddRequests.add(jobApplicationAddRequest);
+        }
+        return jobApplicationAddRequests;
+    }
+
+    @GetMapping(value = "/getByJob/{uuid}")
+    public List<JobApplicationAddRequest> getApplicationsForJob(@PathVariable UUID uuid) {
+        List<JobApplication> jobApplications;
+        List<JobApplicationAddRequest> jobApplicationAddRequests = new ArrayList<>();
+        jobApplications = jobApplicationService.getApplicationsForJob(uuid);
+        for (JobApplication jobApplication : jobApplications) {
+            JobApplicationAddRequest jobApplicationAddRequest = new JobApplicationAddRequest(jobApplication);
+            jobApplicationAddRequests.add(jobApplicationAddRequest);
+        }
+        return jobApplicationAddRequests;
     }
 }

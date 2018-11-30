@@ -1,5 +1,6 @@
 package io.github.cristaling.swegg.backend.web.requests;
 
+import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
@@ -22,6 +23,13 @@ public class JobAddRequest {
         this.jobStatus = jobStatus;
         this.title = title;
         this.description = description;
+    }
+
+    private JobAddRequest(Job job) {
+        this.jobType = job.getJobType();
+        this.jobStatus = job.getJobStatus();
+        this.title = job.getTitle();
+        this.description = job.getDescription();
     }
 
     public JobType getJobType() {

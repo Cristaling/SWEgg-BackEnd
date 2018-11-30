@@ -5,6 +5,7 @@ import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.service.JobService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
+import io.github.cristaling.swegg.backend.utils.enums.JobType;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +48,8 @@ public class JobController {
 
         Job job = jobService.addJob(jobAddRequest, userByToken);
 
-        System.out.println(jobAddRequest.toString());
-
         if (job == null) {
-            //return new ResponseEntity("Job from this Owner with this status already exists", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Job should have all it's fields entered.", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.CREATED);
     }
@@ -83,6 +82,11 @@ public class JobController {
         }
 
         return new ResponseEntity(this.jobService.getJob(uuid), HttpStatus.OK);
+    }
+
+    @GetMapping("/types")
+    public ResponseEntity getJobTypes(){
+        return new ResponseEntity(JobType.values(), HttpStatus.OK);
     }
 
 	@GetMapping("/related")

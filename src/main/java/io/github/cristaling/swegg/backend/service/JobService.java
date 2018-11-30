@@ -31,13 +31,14 @@ public class JobService {
 
     public Job addJob(JobAddRequest jobAddRequest, Member member) {
 
-        if (jobRepository.getJobByOwnerAndJobStatus(member, jobAddRequest.getJobStatus()) != null) {
+        if (jobRepository.getJobsByOwnerAndJobStatus(member, jobAddRequest.getJobStatus()).size() >7) {
             return null;
         }
-        Job job = new Job();
-        job.setJobStatus(jobAddRequest.getJobStatus());
+        if(jobAddRequest.getTitle().length() < 5 || jobAddRequest.getDescription().length() < 5){
+            return null;
+        }
+        Job job = new Job(jobAddRequest);
         job.setOwner(member);
-        job.setJobType(jobAddRequest.getJobType());
         jobRepository.save(job);
         jobRepository.flush();
 

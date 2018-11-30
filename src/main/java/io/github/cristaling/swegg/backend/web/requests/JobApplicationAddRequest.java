@@ -1,6 +1,7 @@
 package io.github.cristaling.swegg.backend.web.requests;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
+import io.github.cristaling.swegg.backend.core.job.JobApplication;
 import io.github.cristaling.swegg.backend.core.member.Member;
 
 public class JobApplicationAddRequest {
@@ -15,6 +16,11 @@ public class JobApplicationAddRequest {
     public JobApplicationAddRequest(Member applicant, Job job) {
         this.applicant = applicant;
         this.job = job;
+    }
+
+    public JobApplicationAddRequest(JobApplication jobApplication){
+        this.job=jobApplication.getJob();
+        this.applicant=jobApplication.getApplicant();
     }
 
     public Member getApplicant() {
