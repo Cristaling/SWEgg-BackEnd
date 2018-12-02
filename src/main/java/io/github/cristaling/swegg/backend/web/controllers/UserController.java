@@ -7,11 +7,17 @@ import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.UpdateProfileRequest;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -93,19 +99,14 @@ public class UserController {
     }
 
     @GetMapping("/profile-picture")
-    public ResponseEntity getProfilePicture(String email, @RequestHeader("Authorization") String token) throws IOException {
-        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-        }
-        Member userByToken= securityService.getUserByToken(token);
+    public ResponseEntity getProfilePicture(String email) throws IOException {
 
-        if (userByToken == null) {
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-        }
-        byte[] profilePicture= userService.getPic(email,userByToken);
+        byte[] profilePicture= userService.getPic(email);
+
         if(profilePicture == null){
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
+
         return new ResponseEntity(Base64.getEncoder().withoutPadding().encodeToString(profilePicture), HttpStatus.OK);
     }
 }
