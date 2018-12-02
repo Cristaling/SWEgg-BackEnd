@@ -109,4 +109,16 @@ public class UserController {
         }
         return new ResponseEntity(Base64.getEncoder().withoutPadding().encodeToString(profilePicture), HttpStatus.OK);
     }
+
+    @GetMapping("/picture")
+    public ResponseEntity getProfilePicture(String email) throws IOException {
+
+        byte[] profilePicture= userService.getPic(email);
+
+        if(profilePicture == null){
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity(Base64.getEncoder().withoutPadding().encodeToString(profilePicture), HttpStatus.OK);
+    }
 }

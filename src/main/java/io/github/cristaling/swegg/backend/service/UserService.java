@@ -15,91 +15,90 @@ import java.io.IOException;
 
 @Service
 public class UserService {
-    private UserRepository userRepository;
-    private UserDataRepository userDataRepository;
-    @Autowired
-    public UserService(UserRepository userRepository, UserDataRepository userDataRepository) {
-        this.userRepository = userRepository;
-        this.userDataRepository = userDataRepository;
-    }
+	private UserRepository userRepository;
+	private UserDataRepository userDataRepository;
 
-    /**
-     *
-     * @param email ->email for the user you want to see the profile
-     * @param userByToken -> user that is logged in
-     * @return profileRepsonse that contains data about the user
-     *         null if the email is not in the db
-     */
-    public ProfileResponse getProfile(String email, Member userByToken) {
-        Member user = userRepository.getMemberByEmail(email);
-        if(user==null){
-            return null;
-        }
-        MemberData userData = user.getMemberData();
-        ProfileResponse profileResponse = new ProfileResponse();
-        profileResponse.setEmail(user.getEmail());
-        profileResponse.setBirthDate(userData.getBirthDate());
-        profileResponse.setFirstName(userData.getFirstName());
-        profileResponse.setLastName(userData.getLastName());
-        profileResponse.setTown(userData.getTown());
-        if (userByToken != null && userByToken.getEmail().equals(email)) {
-        //TODO it will contains personal data about the user. now there are none
-            return profileResponse;
-        }
-        return profileResponse;
-    }
+	@Autowired
+	public UserService(UserRepository userRepository, UserDataRepository userDataRepository) {
+		this.userRepository = userRepository;
+		this.userDataRepository = userDataRepository;
+	}
 
-    public ProfileResponse updateProfile(UpdateProfileRequest profileRequest, Member userByToken) {
-        Member user = userRepository.getMemberByEmail(profileRequest.getEmail());
-        if(user==null){
-            return null;
-        }
-        if(!userByToken.getEmail().equals(profileRequest.getEmail())){
-            return null;
-        }
+	/**
+	 * @param email       ->email for the user you want to see the profile
+	 * @param userByToken -> user that is logged in
+	 * @return profileRepsonse that contains data about the user
+	 * null if the email is not in the db
+	 */
+	public ProfileResponse getProfile(String email, Member userByToken) {
+		Member user = userRepository.getMemberByEmail(email);
+		if (user == null) {
+			return null;
+		}
+		MemberData userData = user.getMemberData();
+		ProfileResponse profileResponse = new ProfileResponse();
+		profileResponse.setEmail(user.getEmail());
+		profileResponse.setBirthDate(userData.getBirthDate());
+		profileResponse.setFirstName(userData.getFirstName());
+		profileResponse.setLastName(userData.getLastName());
+		profileResponse.setTown(userData.getTown());
+		if (userByToken != null && userByToken.getEmail().equals(email)) {
+			//TODO it will contains personal data about the user. now there are none
+			return profileResponse;
+		}
+		return profileResponse;
+	}
 
-        MemberData userDataUpdated=user.getMemberData();
-        userDataUpdated.setBirthDate(profileRequest.getBirthDate());
-        userDataUpdated.setFirstName(profileRequest.getFirstName());
-        userDataUpdated.setLastName(profileRequest.getLastName());
-        userDataUpdated.setTown(profileRequest.getTown());
+	public ProfileResponse updateProfile(UpdateProfileRequest profileRequest, Member userByToken) {
+		Member user = userRepository.getMemberByEmail(profileRequest.getEmail());
+		if (user == null) {
+			return null;
+		}
+		if (!userByToken.getEmail().equals(profileRequest.getEmail())) {
+			return null;
+		}
 
-        userDataRepository.save(userDataUpdated);
-        userDataRepository.flush();
+		MemberData userDataUpdated = user.getMemberData();
+		userDataUpdated.setBirthDate(profileRequest.getBirthDate());
+		userDataUpdated.setFirstName(profileRequest.getFirstName());
+		userDataUpdated.setLastName(profileRequest.getLastName());
+		userDataUpdated.setTown(profileRequest.getTown());
 
-        ProfileResponse profileResponse = new ProfileResponse();
-        profileResponse.setEmail(user.getEmail());
-        profileResponse.setBirthDate(profileRequest.getBirthDate());
-        profileResponse.setFirstName(profileRequest.getFirstName());
-        profileResponse.setLastName(profileRequest.getLastName());
-        profileResponse.setTown(profileRequest.getTown());
+		userDataRepository.save(userDataUpdated);
+		userDataRepository.flush();
 
-        return profileResponse;
-    }
+		ProfileResponse profileResponse = new ProfileResponse();
+		profileResponse.setEmail(user.getEmail());
+		profileResponse.setBirthDate(profileRequest.getBirthDate());
+		profileResponse.setFirstName(profileRequest.getFirstName());
+		profileResponse.setLastName(profileRequest.getLastName());
+		profileResponse.setTown(profileRequest.getTown());
 
-    @Transactional
-    public boolean uploadPhoto(MultipartFile file, String email,Member userByToken) throws IOException {
-        Member user = userRepository.getMemberByEmail(email);
-        if(user==null){
-            return false;
-        }
-        if(!userByToken.getEmail().equals(email)){
-            return false;
-        }
-        MemberData memberData = user.getMemberData();
-        memberData.setPicture(file.getBytes());
-        userDataRepository.save(memberData);
-        return true;
-    }
+		return profileResponse;
+	}
 
-    public byte[] getPic(String email, Member userByToken){
-        Member user = userRepository.getMemberByEmail(email);
-        if(user==null){
-            return null;
-        }
-        if(!userByToken.getEmail().equals(email)){
-            return null;
-        }
-        return user.getMemberData().getPicture();
-    }
+	@Transactional
+	public boolean uploadPhoto(MultipartFile file, String email, Member userByToken) throws IOException {
+		Member user = userRepository.getMemberByEmail(email);
+		if (user == null) {
+			return false;
+		}
+		if (!userByToken.getEmail().equals(email)) {
+			return false;
+		}
+		MemberData memberData = user.getMemberData();
+		memberData.setPicture(file.getBytes());
+		userDataRepository.save(memberData);
+		return true;
+	}
+
+	public byte[] getPic(String email) {
+		Member user = userRepository.getMemberByEmail(email);
+
+		if (user == null) {
+			return null;
+		}
+
+		return user.getMemberData().getPicture();
+	}
 }
