@@ -107,6 +107,6 @@ public class UserController {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity(Base64.getEncoder().withoutPadding().encodeToString(profilePicture), HttpStatus.OK);
+        return new ResponseEntity(profilePicture, HttpStatus.OK);
     }
 }
