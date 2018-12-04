@@ -6,6 +6,7 @@ import io.github.cristaling.swegg.backend.service.AbilityService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.EndorsementRequest;
+import io.github.cristaling.swegg.backend.web.responses.EndorsementResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,7 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @CrossOrigin
@@ -58,7 +63,17 @@ public class AbilityController {
 		if (!this.securityService.canAccessRole(token, MemberRole.PROVIDER)) {
 			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
-		return new ResponseEntity(this.abilityService.getEndorsementsByMember(email), HttpStatus.OK);
+
+		HashMap<Ability, List<String>> endorsementMap = this.abilityService.getEndorsementsByMember(email);
+		List<EndorsementResponse> result = new ArrayList<>();
+
+		for (Map.Entry<Ability, List<String>> entry : endorsementMap.entrySet()) {
+			result.add(new EndorsementResponse(entry.getKey().getName(), entry.getValue()));
+		}
+
+		result.sort(Comparator.comparing(EndorsementResponse::getAbility));
+
+		return new ResponseEntity(result, HttpStatus.OK);
 	}
 
 	@RequestMapping("/endorse")
@@ -71,10 +86,7 @@ public class AbilityController {
 		Ability ability = this.abilityService.getAbilityByName(request.getAbilityName());
 
 		if (ability == null) {
-			if (!endorser.getEmail().equals(request.getEmail())) {
-				return new ResponseEntity(HttpStatus.BAD_REQUEST);
-			}
-			ability = this.abilityService.addAbility(request.getAbilityName(), "General");
+			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		}
 
 		this.abilityService.toggleEndorsement(endorser, request.getEmail(), ability.getUuid());

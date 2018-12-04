@@ -20,6 +20,9 @@ public class Ability {
 	private String category;
 	private String name;
 
+	public Ability() {
+	}
+
 	public UUID getUuid() {
 		return uuid;
 	}
