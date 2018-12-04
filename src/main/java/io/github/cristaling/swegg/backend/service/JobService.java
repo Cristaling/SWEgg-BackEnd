@@ -1,9 +1,12 @@
 package io.github.cristaling.swegg.backend.service;
 
+import io.github.cristaling.swegg.backend.core.abilities.Ability;
+import io.github.cristaling.swegg.backend.core.abilities.AbilityUse;
 import io.github.cristaling.swegg.backend.core.job.Job;
-import io.github.cristaling.swegg.backend.core.job.JobApplication;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.repositories.AbilityRepository;
+import io.github.cristaling.swegg.backend.repositories.AbilityUseRepository;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
@@ -12,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,12 +26,16 @@ public class JobService {
     private JobRepository jobRepository;
     private UserRepository userRepository;
     private JobApplicationRepository jobApplicationRepository;
+    private AbilityRepository abilityRepository;
+    private AbilityUseRepository abilityUseRepository;
 
     @Autowired
-    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository) {
+    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityRepository abilityRepository, AbilityUseRepository abilityUseRepository) {
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
         this.jobApplicationRepository = jobApplicationRepository;
+        this.abilityRepository = abilityRepository;
+        this.abilityUseRepository = abilityUseRepository;
     }
 
     public Job addJob(JobAddRequest jobAddRequest, Member member) {
@@ -37,10 +46,24 @@ public class JobService {
         if(jobAddRequest.getTitle().length() < 5 || jobAddRequest.getDescription().length() < 5){
             return null;
         }
+
         Job job = new Job(jobAddRequest);
         job.setOwner(member);
+
+
         jobRepository.save(job);
         jobRepository.flush();
+
+        for (String abilityName : jobAddRequest.getAbilities()) {
+            AbilityUse abilityUse = new AbilityUse();
+
+            Ability ability = this.abilityRepository.getAbilityByName(abilityName);
+
+            abilityUse.setAbility(ability);
+            abilityUse.setJob(job);
+
+            this.abilityUseRepository.save(abilityUse);
+        }
 
         return job;
     }

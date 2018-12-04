@@ -1,9 +1,10 @@
 package io.github.cristaling.swegg.backend.web.requests;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
-import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
+
+import java.util.List;
 
 public class JobAddRequest {
 
@@ -14,6 +15,8 @@ public class JobAddRequest {
     private String title;
 
     private String description;
+
+    private List<String> abilities;
 
     public JobAddRequest() {
     }
@@ -62,5 +65,9 @@ public class JobAddRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<String> getAbilities() {
+        return abilities;
     }
 }
