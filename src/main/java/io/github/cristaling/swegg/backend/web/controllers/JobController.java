@@ -49,7 +49,7 @@ public class JobController {
         Job job = jobService.addJob(jobAddRequest, userByToken);
 
         if (job == null) {
-            return new ResponseEntity("Job should have all it's fields entered.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.CREATED);
     }

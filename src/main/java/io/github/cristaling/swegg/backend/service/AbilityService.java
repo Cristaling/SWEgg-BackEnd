@@ -120,10 +120,14 @@ public class AbilityService {
 
 	public Ability getAbilityByName(String abilityName) {
 		try {
-			return this.abilityRepository.getAbilityByName(abilityName);
+			Ability ability = this.abilityRepository.getAbilityByName(abilityName);
+			if (ability != null) {
+				return ability;
+			}
 		} catch (EntityNotFoundException ex) {
-			return null;
+
 		}
+		return addAbility(abilityName, "General");
 	}
 
 }

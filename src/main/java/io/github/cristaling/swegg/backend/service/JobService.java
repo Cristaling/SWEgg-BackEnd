@@ -5,7 +5,6 @@ import io.github.cristaling.swegg.backend.core.abilities.AbilityUse;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
-import io.github.cristaling.swegg.backend.repositories.AbilityRepository;
 import io.github.cristaling.swegg.backend.repositories.AbilityUseRepository;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
@@ -26,16 +25,17 @@ public class JobService {
     private JobRepository jobRepository;
     private UserRepository userRepository;
     private JobApplicationRepository jobApplicationRepository;
-    private AbilityRepository abilityRepository;
     private AbilityUseRepository abilityUseRepository;
 
+    private AbilityService abilityService;
+
     @Autowired
-    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityRepository abilityRepository, AbilityUseRepository abilityUseRepository) {
+    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityService abilityService) {
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
         this.jobApplicationRepository = jobApplicationRepository;
-        this.abilityRepository = abilityRepository;
         this.abilityUseRepository = abilityUseRepository;
+        this.abilityService = abilityService;
     }
 
     public Job addJob(JobAddRequest jobAddRequest, Member member) {
@@ -57,7 +57,7 @@ public class JobService {
         for (String abilityName : jobAddRequest.getAbilities()) {
             AbilityUse abilityUse = new AbilityUse();
 
-            Ability ability = this.abilityRepository.getAbilityByName(abilityName);
+            Ability ability = this.abilityService.getAbilityByName(abilityName);
 
             abilityUse.setAbility(ability);
             abilityUse.setJob(job);
