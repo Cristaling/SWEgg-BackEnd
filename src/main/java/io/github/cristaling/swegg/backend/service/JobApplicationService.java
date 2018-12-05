@@ -7,7 +7,6 @@ import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
-import io.github.cristaling.swegg.backend.web.requests.JobApplicationAddRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,23 +29,28 @@ public class JobApplicationService {
     }
 
 
-    /**
-     * @param jobApplicationAddRequest JobApplication to be addded
-     * @return jobApplication added, null if exists already an application
-     */
-    public JobApplication addJobApplication(JobApplicationAddRequest jobApplicationAddRequest) {
+    public boolean addJobApplication(Member member, UUID jobUUID) {
 
-        if (jobApplicationRepository.getJobApplicationByApplicantAndJob(jobApplicationAddRequest.getApplicant(), jobApplicationAddRequest.getJob()) != null) {
-            return null;
+        Job job;
+
+        try {
+            job = this.jobRepository.getOne(jobUUID);
+        } catch (EntityNotFoundException e) {
+            return false;
         }
+
+        if (jobApplicationRepository.getJobApplicationByApplicantAndJob(member, job) != null) {
+            return false;
+        }
+
         JobApplication jobApplication = new JobApplication();
 
-        jobApplication.setApplicant(jobApplicationAddRequest.getApplicant());
-        jobApplication.setJob(jobApplicationAddRequest.getJob());
+        jobApplication.setApplicant(member);
+        jobApplication.setJob(job);
 
         jobApplicationRepository.save(jobApplication);
 
-        return jobApplication;
+        return true;
     }
 
     public List<JobApplication> getAll() {

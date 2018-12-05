@@ -9,6 +9,7 @@ import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.requests.JobApplicationAddRequest;
+import io.github.cristaling.swegg.backend.web.requests.UUIDRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,21 +35,19 @@ public class JobApplicationController {
     }
 
     @PostMapping
-    public ResponseEntity addJobApplication(@RequestHeader("Authorization") String token, @RequestParam JobAddRequest jobAddRequest) {
+    public ResponseEntity addJobApplication(@RequestHeader("Authorization") String token, @RequestBody UUIDRequest request) {
 
         if (!securityService.canAccessRole(token, MemberRole.PROVIDER)) {
-            return new ResponseEntity("Member doesnt have permission", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
+
         Member member = securityService.getUserByToken(token);
-        Job job=new Job(jobAddRequest);
-        JobApplicationAddRequest jobApplicationAddRequest = new JobApplicationAddRequest(member, job);
-        JobApplication jobApplication = this.jobApplicationService.addJobApplication(jobApplicationAddRequest);
 
-        if (jobApplication == null) {
-            return new ResponseEntity("JobApplication for Job by Member already exists", HttpStatus.BAD_REQUEST);
-
+        if (this.jobApplicationService.addJobApplication(member, request.getUuid())) {
+            return new ResponseEntity(HttpStatus.OK);
         }
-        return new ResponseEntity(HttpStatus.CREATED);
+
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping(value = "/getByParticipant/{email}")
