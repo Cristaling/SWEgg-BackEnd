@@ -1,13 +1,23 @@
 package io.github.cristaling.swegg.backend.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.util.Utils;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.member.MemberData;
+import io.github.cristaling.swegg.backend.repositories.UserDataRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.utils.ImageUtils;
 import io.github.cristaling.swegg.backend.utils.SecurityUtils;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,10 +25,19 @@ import java.util.UUID;
 public class SecurityService {
 
 	private UserRepository userRepository;
+	private UserDataRepository userDataRepository;
+
+	private GoogleIdTokenVerifier verifier;
+
 
 	@Autowired
-	public SecurityService(UserRepository userRepository) {
+	public SecurityService(UserRepository userRepository, UserDataRepository userDataRepository) {
 		this.userRepository = userRepository;
+		this.userDataRepository = userDataRepository;
+
+		this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), Utils.getDefaultJsonFactory())
+				.setAudience(Arrays.asList("571895084013-hcqh7qd55ueagegmd13efpin3tq6hcim.apps.googleusercontent.com"))
+				.build();
 	}
 
 	/**
@@ -45,6 +64,75 @@ public class SecurityService {
 		}
 
 		return SecurityUtils.getTokenByUUID(member.getUuid().toString());
+	}
+
+	public String socialLogin(String idTokenString) {
+
+		try {
+			GoogleIdToken idToken = verifier.verify(idTokenString);
+
+			if (idToken != null) {
+				GoogleIdToken.Payload payload = idToken.getPayload();
+
+				String userId = payload.getSubject();
+
+				Member existent = this.userRepository.getMemberByGoogleID(userId);
+
+				if (existent != null && !existent.getEmail().equalsIgnoreCase("iovarares@gmail.com")) {
+					return SecurityUtils.getTokenByUUID(existent.getUuid().toString());
+				}
+
+				String email = payload.getEmail();
+
+//				boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
+//				String name = (String) payload.get("name");
+//				String locale = (String) payload.get("locale");
+				String pictureUrl = (String) payload.get("picture");
+				String familyName = (String) payload.get("family_name");
+				String givenName = (String) payload.get("given_name");
+
+				existent = this.userRepository.getMemberByEmail(email);
+
+				if (existent != null) {
+					existent.setGoogleID(userId);
+
+					MemberData existentMemberData = existent.getMemberData();
+					existentMemberData.setPicture(ImageUtils.getBytesFromURL(pictureUrl));
+					this.userDataRepository.save(existentMemberData);
+
+					this.userRepository.save(existent);
+
+					return SecurityUtils.getTokenByUUID(existent.getUuid().toString());
+				}
+
+				MemberData memberData = new MemberData();
+				memberData.setFirstName(givenName);
+				memberData.setLastName(familyName);
+				memberData.setPicture(ImageUtils.getBytesFromURL(pictureUrl));
+
+				Member member = new Member();
+				member.setEmail(email);
+				member.setPassword(UUID.randomUUID().toString());
+				member.setMemberData(memberData);
+				member.setRole(MemberRole.CLIENT);
+				member.setGoogleID(userId);
+
+				memberData.setMember(member);
+
+				userRepository.save(member);
+				userRepository.flush();
+
+				userDataRepository.save(memberData);
+				userDataRepository.flush();
+
+				return SecurityUtils.getTokenByUUID(member.getUuid().toString());
+			} else {
+				return null;
+			}
+		} catch (GeneralSecurityException | IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -91,5 +179,4 @@ public class SecurityService {
 
 		return user.get();
 	}
-
 }

@@ -31,6 +31,8 @@ public class Member {
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "member" ,cascade= CascadeType.ALL)
 	private MemberData memberData;
 
+	private String googleID;
+
 	public UUID getUuid() {
 		return uuid;
 	}
@@ -65,5 +67,13 @@ public class Member {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getGoogleID() {
+		return googleID;
+	}
+
+	public void setGoogleID(String googleID) {
+		this.googleID = googleID;
 	}
 }
