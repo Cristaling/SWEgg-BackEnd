@@ -72,12 +72,20 @@ public class JobService {
         return jobRepository.findAll();
     }
 
-    public List<JobSummary> getJobSummaries(int page, int count) {
+    public List<JobSummary> getJobSummaries(String title, int page, int count) {
         List<Job> jobs;
-        if (page < 0) {
-            jobs = this.jobRepository.findAll();
-        } else {
-            jobs = this.jobRepository.findAll(PageRequest.of(page, count)).getContent();
+        if("".equals(title)){
+            if (page < 0) {
+                jobs = this.jobRepository.findAll();
+            } else {
+                jobs = this.jobRepository.findAll(PageRequest.of(page, count)).getContent();
+            }
+        } else{
+            if (page < 0) {
+                jobs = this.jobRepository.getJobsByTitleContainingIgnoreCase(title);
+            } else {
+                jobs = this.jobRepository.getJobsByTitleContainingIgnoreCase(PageRequest.of(page, count), title).getContent();
+            }
         }
         return jobs.stream().map(this::getSummary).collect(Collectors.toList());
     }

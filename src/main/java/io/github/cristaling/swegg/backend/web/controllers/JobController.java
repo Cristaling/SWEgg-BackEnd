@@ -56,6 +56,7 @@ public class JobController {
 
     @GetMapping("/summaries")
     public ResponseEntity getJobSummaries(@RequestHeader("Authorization") String token,
+                                          @RequestParam(defaultValue = "") String title,
                                           @RequestParam(defaultValue = "0") int page,
                                           @RequestParam(defaultValue = "10") int count) {
 
@@ -63,7 +64,7 @@ public class JobController {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
 
-        List<JobSummary> summaries = this.jobService.getJobSummaries(page, count);
+        List<JobSummary> summaries = this.jobService.getJobSummaries(title, page, count);
 
         return new ResponseEntity(summaries, HttpStatus.OK);
     }
