@@ -3,6 +3,8 @@ package io.github.cristaling.swegg.backend.repositories;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -15,5 +17,6 @@ public interface JobRepository extends JpaRepository<Job, UUID> {
     @Query(value = "Select distinct * from jobs where (jobs.user_uuid= ?1 and (job_status != 'DONE' OR job_status != 'DRAFT') ) or (jobs.employee_uuid =?1 and jobs.job_status = 'ACCEPTED')", nativeQuery = true)
     List<Job> getAllJobsForUser( UUID userId);
     List<Job>getByOwner(Member member);
-
+    List<Job> getJobsByTitleContainingIgnoreCase(String title);
+    Page<Job> getJobsByTitleContainingIgnoreCase(Pageable pageRequest, String title);
 }
