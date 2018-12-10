@@ -73,16 +73,17 @@ public class JobService {
 
         jobRepository.save(job);
         jobRepository.flush();
+        if(jobAddRequest.getAbilities().size()!=0) {
+            for (String abilityName : jobAddRequest.getAbilities()) {
+                AbilityUse abilityUse = new AbilityUse();
 
-        for (String abilityName : jobAddRequest.getAbilities()) {
-            AbilityUse abilityUse = new AbilityUse();
+                Ability ability = this.abilityService.getAbilityByName(abilityName);
 
-            Ability ability = this.abilityService.getAbilityByName(abilityName);
+                abilityUse.setAbility(ability);
+                abilityUse.setJob(job);
 
-            abilityUse.setAbility(ability);
-            abilityUse.setJob(job);
-
-            this.abilityUseRepository.save(abilityUse);
+                this.abilityUseRepository.save(abilityUse);
+            }
         }
         return addAbilitiesToJob(job);
     }
