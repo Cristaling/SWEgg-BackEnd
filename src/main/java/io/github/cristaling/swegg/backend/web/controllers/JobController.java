@@ -8,6 +8,7 @@ import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
+import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class JobController {
         }
         Member userByToken = securityService.getUserByToken(token);
 
-        Job job = jobService.addJob(jobAddRequest, userByToken);
+        JobWithAbilities job = jobService.addJob(jobAddRequest, userByToken);
 
         if (job == null) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -76,13 +77,13 @@ public class JobController {
         }
 
         UUID uuid = UUID.fromString(jobUUID);
-        Job job = this.jobService.getJob(uuid);
+        JobWithAbilities job = this.jobService.getJob(uuid);
 
         if (job == null) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity(this.jobService.getJob(uuid), HttpStatus.OK);
+        return new ResponseEntity(job, HttpStatus.OK);
     }
 
     @GetMapping("/types")

@@ -12,5 +12,4 @@ public interface AbilityRepository extends JpaRepository<Ability, UUID> {
 
 	List<Ability> getAbilitiesByCategory(String category);
 	Ability getAbilityByName(String name);
-
 }

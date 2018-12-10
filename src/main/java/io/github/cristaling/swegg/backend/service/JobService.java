@@ -5,11 +5,9 @@ import io.github.cristaling.swegg.backend.core.abilities.AbilityUse;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
-import io.github.cristaling.swegg.backend.repositories.AbilityUseRepository;
-import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
-import io.github.cristaling.swegg.backend.repositories.JobRepository;
-import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.repositories.*;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
+import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -26,19 +24,41 @@ public class JobService {
     private UserRepository userRepository;
     private JobApplicationRepository jobApplicationRepository;
     private AbilityUseRepository abilityUseRepository;
+    private AbilityRepository abilityRepository;
 
     private AbilityService abilityService;
 
     @Autowired
-    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityService abilityService) {
+    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, AbilityService abilityService) {
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
         this.jobApplicationRepository = jobApplicationRepository;
         this.abilityUseRepository = abilityUseRepository;
+        this.abilityRepository = abilityRepository;
         this.abilityService = abilityService;
     }
 
-    public Job addJob(JobAddRequest jobAddRequest, Member member) {
+    private JobWithAbilities addAbilitiesToJob(Job job){
+        JobWithAbilities jobWithAbilities=new JobWithAbilities(job);
+
+        List<AbilityUse> uses=abilityUseRepository.getAbilityUsesByJob(job);
+        List<Ability> abilities=new ArrayList<>();
+        for(AbilityUse use: uses){
+            abilities.add(use.getAbility());
+        }
+        jobWithAbilities.setAbilities(abilities);
+        return jobWithAbilities;
+    }
+
+    private List<JobWithAbilities> addAbilitiesToJobs(List<Job> jobs){
+        List<JobWithAbilities> jobWithAbilitiesList=new ArrayList<>();
+        for(Job job : jobs){
+            jobWithAbilitiesList.add(addAbilitiesToJob(job));
+        }
+        return jobWithAbilitiesList;
+    }
+
+    public JobWithAbilities addJob(JobAddRequest jobAddRequest, Member member) {
 
         if (jobRepository.getJobsByOwnerAndJobStatus(member, jobAddRequest.getJobStatus()).size() >7) {
             return null;
@@ -64,12 +84,11 @@ public class JobService {
 
             this.abilityUseRepository.save(abilityUse);
         }
-
-        return job;
+        return addAbilitiesToJob(job);
     }
 
-    public List<Job> getAll() {
-        return jobRepository.findAll();
+    public List<JobWithAbilities> getAll() {
+        return addAbilitiesToJobs(jobRepository.findAll());
     }
 
     public List<JobSummary> getJobSummaries(String title, int page, int count) {
@@ -87,7 +106,12 @@ public class JobService {
                 jobs = this.jobRepository.getJobsByTitleContainingIgnoreCase(PageRequest.of(page, count), title).getContent();
             }
         }
-        return jobs.stream().map(this::getSummary).collect(Collectors.toList());
+        List<JobWithAbilities> jobWithAbilitiesList= addAbilitiesToJobs(jobs);
+        List<JobSummary> jobSummaries=new ArrayList<>();
+        for(JobWithAbilities jobWithAbilities : jobWithAbilitiesList){
+            jobSummaries.add(new JobSummary(jobWithAbilities));
+        }
+        return jobSummaries;
     }
 
     public List<JobSummary> getUserJobs(String email, Member userByToken){
@@ -106,20 +130,11 @@ public class JobService {
 
 
     private JobSummary getSummary(Job job) {
-        JobSummary jobSummary = new JobSummary();
-        jobSummary.setUuid(job.getUuid());
-        jobSummary.setTitle(job.getTitle());
-        jobSummary.setDescription(job.getDescription());
-
-        Member owner = job.getOwner();
-
-        jobSummary.setOwnerEmail(owner.getEmail());
-        jobSummary.setOwnerName(owner.getMemberData().getFirstName() + " " + owner.getMemberData().getLastName());
-
-        return jobSummary;
+        JobWithAbilities jobWithAbilities=addAbilitiesToJob(job);
+        return new JobSummary(jobWithAbilities);
     }
 
-    public Job getJob(UUID uuid) {
-        return this.jobRepository.getOne(uuid);
+    public JobWithAbilities getJob(UUID uuid) {
+        return addAbilitiesToJob(this.jobRepository.getOne(uuid));
     }
 }

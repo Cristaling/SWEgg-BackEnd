@@ -1,5 +1,6 @@
 package io.github.cristaling.swegg.backend.core.abilities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -21,11 +22,12 @@ public class AbilityUse {
 	@GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
 	private UUID uuid;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "job_uuid", nullable = false)
+	@JsonIgnore
 	private Job job;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "ability_uuid", nullable = false)
 	private Ability ability;
 
