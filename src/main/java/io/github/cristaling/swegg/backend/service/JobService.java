@@ -5,7 +5,11 @@ import io.github.cristaling.swegg.backend.core.abilities.AbilityUse;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
-import io.github.cristaling.swegg.backend.repositories.*;
+import io.github.cristaling.swegg.backend.repositories.AbilityRepository;
+import io.github.cristaling.swegg.backend.repositories.AbilityUseRepository;
+import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
+import io.github.cristaling.swegg.backend.repositories.JobRepository;
+import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class JobService {
@@ -60,9 +63,9 @@ public class JobService {
 
     public JobWithAbilities addJob(JobAddRequest jobAddRequest, Member member) {
 
-        if (jobRepository.getJobsByOwnerAndJobStatus(member, jobAddRequest.getJobStatus()).size() >7) {
-            return null;
-        }
+//        if (jobRepository.getJobsByOwnerAndJobStatus(member, jobAddRequest.getJobStatus()).size() >7) {
+//            return null;
+//        }
         if(jobAddRequest.getTitle().length() < 5 || jobAddRequest.getDescription().length() < 5){
             return null;
         }
