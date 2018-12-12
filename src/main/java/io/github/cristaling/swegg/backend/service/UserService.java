@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 @Service
@@ -82,14 +84,19 @@ public class UserService {
 		return true;
 	}
 
-	public byte[] getPic(String email) {
+	public byte[] getPic(String email) throws IOException {
 
 		Member user = userRepository.getMemberByEmail(email);
-
 		if (user == null) {
 			return null;
 		}
-
-		return user.getMemberData().getPicture();
+		byte[] picture=user.getMemberData().getPicture();
+		if(picture==null){
+			File file =  new File("src\\main\\resources\\image\\user-default-image.jpeg");
+			FileInputStream fileInputStreamReader = new FileInputStream(file);
+			picture = new byte[(int)file.length()];
+			fileInputStreamReader.read(picture);
+		}
+		return picture;
 	}
 }
