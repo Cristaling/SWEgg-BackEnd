@@ -10,6 +10,7 @@ import io.github.cristaling.swegg.backend.repositories.AbilityUseRepository;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,5 +141,19 @@ public class JobService {
 
     public JobWithAbilities getJob(UUID uuid) {
         return addAbilitiesToJob(this.jobRepository.getOne(uuid));
+    }
+
+    public boolean selectEmployeeForJob(Member owner, String jobUUID, String employeeEmail) {
+        Job job =this.jobRepository.getOne(UUID.fromString(jobUUID));
+        if(!job.getOwner().getEmail().equals(owner.getEmail()))
+            return false;
+        Member employee = this.userRepository.getMemberByEmail(employeeEmail);
+        if(employee == null)
+            return false;
+        job.setEmployee(employee);
+        job.setJobStatus(JobStatus.ACCEPTED);
+        this.jobRepository.save(job);
+        this.jobRepository.flush();
+        return true;
     }
 }
