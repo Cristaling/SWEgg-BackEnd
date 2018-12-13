@@ -30,15 +30,17 @@ public class JobService {
     private AbilityUseRepository abilityUseRepository;
     private AbilityRepository abilityRepository;
 
+    private EmailSenderService emailSenderService;
     private AbilityService abilityService;
 
     @Autowired
-    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, AbilityService abilityService) {
+    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, EmailSenderService emailSenderService, AbilityService abilityService) {
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
         this.jobApplicationRepository = jobApplicationRepository;
         this.abilityUseRepository = abilityUseRepository;
         this.abilityRepository = abilityRepository;
+        this.emailSenderService = emailSenderService;
         this.abilityService = abilityService;
     }
 
@@ -154,6 +156,9 @@ public class JobService {
         job.setJobStatus(JobStatus.ACCEPTED);
         this.jobRepository.save(job);
         this.jobRepository.flush();
+
+        emailSenderService.sendJobInviteNotificationToMember(job);
+
         return true;
     }
 }
