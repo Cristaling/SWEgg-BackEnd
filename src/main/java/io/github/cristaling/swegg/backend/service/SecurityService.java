@@ -191,7 +191,7 @@ public class SecurityService {
 		if(member == null){
 			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
-		if(!member.isVerified()){
+		if(member.isVerified()){
 			return new ResponseEntity(HttpStatus.CONFLICT);
 		}
 		member.setVerified(true);

@@ -56,7 +56,6 @@ public class RegisterService {
                 userRepository.getMemberByEmailAndPassword(
                         registerRequest.getEmail(),
                         registerRequest.getPassword()));
-        emailSenderService.sendConfirmationMail(member);
 
         return member;
 
