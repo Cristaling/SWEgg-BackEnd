@@ -1,5 +1,6 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
+import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.web.requests.LoginRequest;
 import io.github.cristaling.swegg.backend.web.requests.SocialLoginRequest;
@@ -50,6 +51,12 @@ public class SecurityController {
 			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
 		return new ResponseEntity(new LoginResponse(token), HttpStatus.OK);
+	}
+
+	@RequestMapping("/verify")
+	public ResponseEntity
+	verifyAccount(String token){
+		return securityService.verifyUserAccount(token);
 	}
 
 }
