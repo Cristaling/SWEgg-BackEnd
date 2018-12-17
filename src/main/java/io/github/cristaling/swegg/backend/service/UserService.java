@@ -6,7 +6,9 @@ import io.github.cristaling.swegg.backend.repositories.UserDataRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import io.github.cristaling.swegg.backend.web.requests.UpdateProfileRequest;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
+import io.github.cristaling.swegg.backend.web.responses.UserSummaryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +16,8 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -98,5 +102,19 @@ public class UserService {
 			fileInputStreamReader.read(picture);
 		}
 		return picture;
+	}
+
+	@Transactional
+    public List<UserSummaryResponse> getSearchedUsers(String name, int page, int count) {
+		List<UserSummaryResponse> userSummaryResponses = new ArrayList<>();
+		List<Member> members= this.userRepository.getMemberByCompleteNameIgnoreCase(PageRequest.of(page, count), name.toLowerCase()).getContent();
+		for(Member member : members) {
+			UserSummaryResponse userSummaryResponse = new UserSummaryResponse();
+			userSummaryResponse.setEmail(member.getEmail());
+			userSummaryResponse.setFirstName(member.getMemberData().getFirstName());
+			userSummaryResponse.setLastName(member.getMemberData().getLastName());
+			userSummaryResponses.add(userSummaryResponse);
+		}
+		return userSummaryResponses;
 	}
 }
