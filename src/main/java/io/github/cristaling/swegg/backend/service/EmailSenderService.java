@@ -46,6 +46,6 @@ public class EmailSenderService {
         sendEmailToEmployee(member.getEmail(),
                 "Thank you for joining LaNegru!",
                 "Please follow the link down below to confirm your account on the website : " +
-                        environment.getProperty("domain.name") +"verify-user/?token="+ SecurityUtils.getTokenByUUID(member.getUuid().toString()));
+                        environment.getProperty("user.confirmation.link") + SecurityUtils.getTokenByUUID(member.getUuid().toString()));
     }
 }
