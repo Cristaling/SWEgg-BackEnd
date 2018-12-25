@@ -3,7 +3,9 @@ package io.github.cristaling.swegg.backend.service;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.NotificationRepository;
+import io.github.cristaling.swegg.backend.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -14,6 +16,9 @@ import java.util.UUID;
 
 @Service
 public class NotificationService {
+
+	@Autowired
+	SimpMessagingTemplate simpMessagingTemplate;
 
 	private NotificationRepository notificationRepository;
 
@@ -58,7 +63,25 @@ public class NotificationService {
 	}
 
 	public void addNotification(Notification notification) {
+		sendData(notification.getMember(), "/notifications", notification);
 		this.notificationRepository.save(notification);
+	}
+
+	/**
+	 * @param member Member to send data to
+	 * @param endpoint Endpoint starting in '/' to where to send data (will pe prefixed by '/events/{token}')
+	 * @param body Data to send
+	 */
+	public void sendData(Member member, String endpoint, Object body) {
+
+		String token = SecurityUtils.getTokenByUUID(member.getUuid().toString());
+
+		StringBuilder destination = new StringBuilder();
+		destination.append("/events/");
+		destination.append(token);
+		destination.append(endpoint);
+
+		simpMessagingTemplate.convertAndSend(destination.toString(), body);
 	}
 
 }
