@@ -6,6 +6,7 @@ import io.github.cristaling.swegg.backend.service.UserService;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.UpdateProfileRequest;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
+import io.github.cristaling.swegg.backend.web.responses.UserSummaryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -108,5 +110,19 @@ public class UserController {
         }
 
         return new ResponseEntity(profilePicture, HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity getSearchedUsers(@RequestParam("name") String name,
+                                           @RequestHeader("Authorization") String token,
+                                           @RequestParam(defaultValue = "0") int page,
+                                           @RequestParam(defaultValue = "20") int count) {
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        List<UserSummaryResponse> searchedUsers = userService.getSearchedUsers(name, page, count);
+
+        return new ResponseEntity(searchedUsers, HttpStatus.OK);
     }
 }

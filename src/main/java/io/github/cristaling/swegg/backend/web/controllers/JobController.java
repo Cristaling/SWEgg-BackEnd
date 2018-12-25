@@ -10,18 +10,12 @@ import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
+import io.github.cristaling.swegg.backend.web.requests.SelectEmployeeRequest;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -43,8 +37,22 @@ public class JobController {
 		this.securityService = securityService;
 	}
 
-	@PostMapping
-	public ResponseEntity addJob(@RequestHeader("Authorization") String token, @RequestBody JobAddRequest jobAddRequest) {
+    @PatchMapping
+    public ResponseEntity selectEmployee(@RequestHeader("Authorization") String token, @RequestBody SelectEmployeeRequest selectEmployeeRequest) {
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        Member userByToken = securityService.getUserByToken(token);
+
+        boolean isOk = this.jobService.selectEmployeeForJob(userByToken, selectEmployeeRequest.getJobUUID(), selectEmployeeRequest.getEmail());
+        if (isOk)
+            return new ResponseEntity(null, HttpStatus.OK);
+        return new ResponseEntity(null,HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping
+    public ResponseEntity addJob(@RequestHeader("Authorization") String token, @RequestBody JobAddRequest jobAddRequest) {
 
 		if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
 			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -80,8 +88,8 @@ public class JobController {
 			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
 
-		UUID uuid = UUID.fromString(jobUUID);
-		JobWithAbilities job = this.jobService.getJob(uuid);
+        UUID uuid = UUID.fromString(jobUUID);
+        JobSummary job = new JobSummary(this.jobService.getJob(uuid));
 
 		if (job == null) {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
