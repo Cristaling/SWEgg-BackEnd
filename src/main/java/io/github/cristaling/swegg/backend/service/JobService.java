@@ -10,6 +10,7 @@ import io.github.cristaling.swegg.backend.repositories.AbilityUseRepository;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +30,17 @@ public class JobService {
     private AbilityUseRepository abilityUseRepository;
     private AbilityRepository abilityRepository;
 
+    private EmailSenderService emailSenderService;
     private AbilityService abilityService;
 
     @Autowired
-    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, AbilityService abilityService) {
+    public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, EmailSenderService emailSenderService, AbilityService abilityService) {
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
         this.jobApplicationRepository = jobApplicationRepository;
         this.abilityUseRepository = abilityUseRepository;
         this.abilityRepository = abilityRepository;
+        this.emailSenderService = emailSenderService;
         this.abilityService = abilityService;
     }
 
@@ -140,5 +143,22 @@ public class JobService {
 
     public JobWithAbilities getJob(UUID uuid) {
         return addAbilitiesToJob(this.jobRepository.getOne(uuid));
+    }
+
+    public boolean selectEmployeeForJob(Member owner, String jobUUID, String employeeEmail) {
+        Job job =this.jobRepository.getOne(UUID.fromString(jobUUID));
+        if(!job.getOwner().getEmail().equals(owner.getEmail()))
+            return false;
+        Member employee = this.userRepository.getMemberByEmail(employeeEmail);
+        if(employee == null)
+            return false;
+        job.setEmployee(employee);
+        job.setJobStatus(JobStatus.ACCEPTED);
+        this.jobRepository.save(job);
+        this.jobRepository.flush();
+
+        emailSenderService.sendJobInviteNotificationToMember(job);
+
+        return true;
     }
 }
