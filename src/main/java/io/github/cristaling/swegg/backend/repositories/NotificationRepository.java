@@ -12,5 +12,6 @@ import java.util.UUID;
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
 
 	List<Notification> getAllByMember(Member member);
+	List<Notification> getAllByMemberAndRead(Member member, boolean read);
 
 }

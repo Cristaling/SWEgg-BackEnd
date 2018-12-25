@@ -35,6 +35,9 @@ public class Notification {
 	@NotNull
 	private String text;
 
+	@NotNull
+	private boolean read = false;
+
 	private String onClickURL;
 
 	private String pictureURL;
@@ -46,6 +49,14 @@ public class Notification {
 	}
 
 	public Notification() {
+	}
+
+	public boolean isRead() {
+		return read;
+	}
+
+	public void setRead(boolean read) {
+		this.read = read;
 	}
 
 	public UUID getUuid() {
