@@ -114,4 +114,18 @@ public class JobController {
         }
         return new ResponseEntity(jobSummaryList, HttpStatus.OK);
     }
+
+    @GetMapping("/own")
+    public ResponseEntity getOwnerJob(@RequestHeader("Authorization") String token, @RequestParam("email") String email) {
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        Member userByToken = securityService.getUserByToken(token);
+        if (userByToken == null) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        List<JobSummary> jobSummaryList = jobService.getOpenJobsForOwner(email);
+
+        return new ResponseEntity(jobSummaryList, HttpStatus.OK);
+    }
 }
