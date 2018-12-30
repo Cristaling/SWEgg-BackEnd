@@ -1,6 +1,7 @@
 package io.github.cristaling.swegg.backend.core.job;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "jobs")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Job {
 
     @Id

@@ -10,6 +10,7 @@ import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.requests.JobApplicationAddRequest;
 import io.github.cristaling.swegg.backend.web.requests.UUIDRequest;
+import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,13 +64,15 @@ public class JobApplicationController {
     }
 
     @GetMapping(value = "/getByJob/{uuid}")
-    public List<JobApplicationAddRequest> getApplicationsForJob(@PathVariable UUID uuid) {
+    public List<ProfileResponse> getApplicationsForJob(@PathVariable UUID uuid) {
         List<JobApplication> jobApplications;
-        List<JobApplicationAddRequest> jobApplicationAddRequests = new ArrayList<>();
+        List<ProfileResponse> jobApplicationAddRequests = new ArrayList<>();
         jobApplications = jobApplicationService.getApplicationsForJob(uuid);
         for (JobApplication jobApplication : jobApplications) {
             JobApplicationAddRequest jobApplicationAddRequest = new JobApplicationAddRequest(jobApplication);
-            jobApplicationAddRequests.add(jobApplicationAddRequest);
+            jobApplicationAddRequests.add
+                    (new ProfileResponse(jobApplicationAddRequest.getApplicant().getMemberData(),
+                            jobApplicationAddRequest.getApplicant().getEmail()));
         }
         return jobApplicationAddRequests;
     }
