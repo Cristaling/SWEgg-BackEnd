@@ -5,6 +5,9 @@ public class AddJobInviteRequest {
     private String email;
     private String jobUUID;
 
+    public AddJobInviteRequest() {
+    }
+
     public AddJobInviteRequest(String email, String jobUUID) {
         this.email = email;
         this.jobUUID = jobUUID;
