@@ -1,7 +1,6 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
 import io.github.cristaling.swegg.backend.core.abilities.Ability;
-import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.service.AbilityService;
@@ -15,7 +14,15 @@ import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
@@ -128,7 +135,7 @@ public class JobController {
 		Member userByToken = securityService.getUserByToken(token);
 
 		List<Ability> userAbilities = this.abilityService.getMemberAbilities(userByToken);
-		List<Job> result = this.jobService.getTopRelevantJobs(userAbilities);
+		List<JobSummary> result = this.jobService.getTopRelevantJobs(userAbilities);
 
 		return new ResponseEntity(result, HttpStatus.OK);
 	}
