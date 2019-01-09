@@ -1,5 +1,6 @@
 package io.github.cristaling.swegg.backend.web.controllers;
 
+import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.service.SecurityService;
 import io.github.cristaling.swegg.backend.web.requests.LoginRequest;
 import io.github.cristaling.swegg.backend.web.requests.SocialLoginRequest;
@@ -7,10 +8,7 @@ import io.github.cristaling.swegg.backend.web.responses.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
@@ -50,6 +48,12 @@ public class SecurityController {
 			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
 		return new ResponseEntity(new LoginResponse(token), HttpStatus.OK);
+	}
+
+	@RequestMapping("/verify")
+	public ResponseEntity
+	verifyAccount(@RequestBody String token){
+		return securityService.verifyUserAccount(token);
 	}
 
 }
