@@ -77,7 +77,7 @@ public class AbilityService {
 			if (ability != null) {
 				return null;
 			}
-		} catch (EntityNotFoundException ex ){
+		} catch (EntityNotFoundException ex) {
 
 		}
 
@@ -130,4 +130,17 @@ public class AbilityService {
 		return addAbility(abilityName, "General");
 	}
 
+	public List<Ability> getMemberAbilities(Member member) {
+
+		List<Ability> result = new ArrayList<>();
+		List<Endorsement> endorsements = this.endorsementRepository.getByEndorsed(member);
+
+		for (Endorsement endorsement : endorsements) {
+			if (!result.contains(endorsement.getAbility())) {
+				result.add(endorsement.getAbility());
+			}
+		}
+
+		return result;
+	}
 }

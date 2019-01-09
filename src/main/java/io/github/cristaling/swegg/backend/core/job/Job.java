@@ -6,6 +6,7 @@ import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
+import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Entity;
@@ -68,6 +69,15 @@ public class Job {
         this.jobStatus = jobAddRequest.getJobStatus();
         this.title = jobAddRequest.getTitle();
         this.description = jobAddRequest.getDescription();
+    }
+
+    public Job(JobWithAbilities jobWithAbilities){
+        this.description = jobWithAbilities.getDescription();
+        this.employee = jobWithAbilities.getEmployee();
+        this.jobStatus = jobWithAbilities.getJobStatus();
+        this.jobType = jobWithAbilities.getJobType();
+        this.owner = jobWithAbilities.getOwner();
+        this.title = jobWithAbilities.getTitle();
     }
 
     public UUID getUuid() {

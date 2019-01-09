@@ -3,6 +3,7 @@ package io.github.cristaling.swegg.backend.service;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
@@ -41,4 +42,10 @@ public class EmailSenderService {
         }).start();
     }
 
+    public void sendConfirmationMail(Member member) {
+        sendEmailToEmployee(member.getEmail(),
+                "Thank you for joining LaNegru!",
+                "Please follow the link down below to confirm your account on the website : " +
+                        environment.getProperty("user.confirmation.link") + SecurityUtils.getTokenByUUID(member.getUuid().toString()));
+    }
 }
