@@ -33,6 +33,8 @@ public class Member {
 
 	private String googleID;
 
+	private boolean isVerified;
+
 	public UUID getUuid() {
 		return uuid;
 	}
@@ -75,5 +77,13 @@ public class Member {
 
 	public void setGoogleID(String googleID) {
 		this.googleID = googleID;
+	}
+
+	public boolean isVerified() {
+		return isVerified;
+	}
+
+	public void setVerified(boolean verified) {
+		isVerified = verified;
 	}
 }

@@ -146,7 +146,7 @@ public class JobService {
 		return addAbilitiesToJob(this.jobRepository.getOne(uuid));
 	}
 
-	public List<Job> getTopRelevantJobs(List<Ability> abilities) {
+	public List<JobSummary> getTopRelevantJobs(List<Ability> abilities) {
 
 		Map<Job, Long> map = abilities.stream()
 				.flatMap(
@@ -162,15 +162,21 @@ public class JobService {
 						)
 				);
 
-		List<Job> jobs = map.entrySet().stream()
+		List<JobSummary> jobs = map.entrySet().stream()
 				.sorted(
 						(o1, o2) -> o2.getValue().compareTo(o1.getValue())
 				)
 				.map(entry -> entry.getKey())
-				.collect(Collectors.toList())
-				.subList(0, 5);
+				.map(JobSummary::new)
+				.collect(Collectors.toList());
 
-		return jobs;
+		int listSize = jobs.size();
+
+		if (listSize == 0) {
+			return new ArrayList<>();
+		}
+
+		return jobs.subList(0, Math.min(5, listSize));
 	}
 
 	public boolean selectEmployeeForJob(Member owner, String jobUUID, String employeeEmail) {

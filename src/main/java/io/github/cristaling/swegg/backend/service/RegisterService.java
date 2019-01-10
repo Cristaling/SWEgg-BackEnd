@@ -13,11 +13,13 @@ import org.springframework.stereotype.Service;
 public class RegisterService {
     private UserRepository userRepository;
     private UserDataRepository userDataRepository;
+    private EmailSenderService emailSenderService;
 
     @Autowired
-    public RegisterService(UserRepository userRepository, UserDataRepository userDataRepository) {
+    public RegisterService(UserRepository userRepository, UserDataRepository userDataRepository, EmailSenderService emailSenderService) {
         this.userRepository = userRepository;
         this.userDataRepository = userDataRepository;
+        this.emailSenderService = emailSenderService;
     }
 
     /**
@@ -41,6 +43,7 @@ public class RegisterService {
         member.setEmail(registerRequest.getEmail());
         member.setPassword(registerRequest.getPassword());
         member.setMemberData(memberData);
+        member.setVerified(false);
         member.setRole(MemberRole.CLIENT);
         memberData.setMember(member);
         userRepository.save(member);
@@ -48,6 +51,11 @@ public class RegisterService {
 
         userDataRepository.save(memberData);
         userDataRepository.flush();
+
+        emailSenderService.sendConfirmationMail(
+                userRepository.getMemberByEmailAndPassword(
+                        registerRequest.getEmail(),
+                        registerRequest.getPassword()));
 
         return member;
 
