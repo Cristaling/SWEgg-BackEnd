@@ -64,7 +64,7 @@ public class JobController {
 		if (job == null) {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity(HttpStatus.CREATED);
+		return new ResponseEntity(job.getUuid(),HttpStatus.CREATED);
 	}
 
 	@GetMapping("/summaries")
