@@ -8,6 +8,8 @@ import io.github.cristaling.swegg.backend.core.member.MemberReviewSummary;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.MemberReviewRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.utils.ServiceActionResult;
+import io.github.cristaling.swegg.backend.utils.enums.ErrorMessages;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,34 +32,53 @@ public class MemberReviewService {
         this.jobRepository = jobRepository;
     }
 
-    public MemberReview addMemberReview(Member reviewer, String reviewedEmail, String text, int stars){
+    public ServiceActionResult<MemberReviewSummary> addMemberReview(Member reviewer, String reviewedEmail, String text, int stars){
+        ServiceActionResult<MemberReviewSummary> result = new ServiceActionResult<>();
+        if(stars==0){
+            result.setError(ErrorMessages.REVIEW_STARS_MISSING);
+            return result;
+        }
         Member reviewed = this.userRepository.getMemberByEmail(reviewedEmail);
         if(reviewed == null){
-            return null;
+            result.setError(ErrorMessages.USER_DOES_NOT_EXIST);
+            return result;
         }
         MemberReview review = this.memberReviewRepository.getMemberReviewByReviewerAndReviewed(reviewer,reviewed);
-        if(review != null){
-            return null;
-        }
-        Job job = this.jobRepository.getJobByOwnerAndEmployee(reviewer, reviewed);
-        if(job == null){
-            return null;
-        }
-        if(!job.getJobStatus().equals(JobStatus.DONE)){
-            return null;
-        }
-
         MemberReview memberReview = new MemberReview();
         memberReview.setReviewed(reviewed);
         memberReview.setReviewer(reviewer);
         memberReview.setText(text);
         memberReview.setStars(stars);
         memberReview.setDateGiven(new Date());
+        if(review != null){
+            memberReview.setUuid(review.getUuid());
+            this.memberReviewRepository.save(memberReview);
+            this.memberReviewRepository.flush();
+            result.setResult(this.getMemberReviewSummary(review));
+            return result;
+        }
+        List<Job> jobs = this.jobRepository.getJobsByOwnerAndEmployee(reviewer, reviewed);
+        if(jobs.size() == 0){
+            result.setError(ErrorMessages.JOB_DOES_NOT_EXIST);
+            return result;
+        }
+        boolean isOk = false;
+        for(Job job : jobs) {
+            if (job.getJobStatus().equals(JobStatus.DONE)) {
+                isOk = true;
+            }
+        }
+        if(!isOk){
+            result.setError(ErrorMessages.JOB_IS_NOT_DONE);
+            return result;
+        }
+
+        result.setResult(this.getMemberReviewSummary(memberReview));
 
         this.memberReviewRepository.save(memberReview);
         this.memberReviewRepository.flush();
 
-        return memberReview;
+        return result;
     }
 
     public List<MemberReviewSummary> getMemberLastReviews(String email){
@@ -81,6 +102,7 @@ public class MemberReviewService {
         MemberData memberData = reviewer.getMemberData();
         memberReviewSummary.setReviewerFirstName(memberData.getFirstName());
         memberReviewSummary.setReviewerLastName(memberData.getLastName());
+        memberReviewSummary.setStars(memberReview.getStars());
         memberReviewSummary.setText(memberReview.getText());
 
         return memberReviewSummary;

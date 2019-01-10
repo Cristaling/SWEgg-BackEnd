@@ -25,7 +25,6 @@ public class MemberReview {
     @JsonIgnore
     private Member reviewed;
 
-    @NotNull
     private String text;
     @NotNull
     private int stars;

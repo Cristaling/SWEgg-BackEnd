@@ -5,6 +5,7 @@ import io.github.cristaling.swegg.backend.core.member.MemberReview;
 import io.github.cristaling.swegg.backend.core.member.MemberReviewSummary;
 import io.github.cristaling.swegg.backend.service.MemberReviewService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
+import io.github.cristaling.swegg.backend.utils.ServiceActionResult;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.AddReviewRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +38,11 @@ public class MemberReviewController {
         String reviewedEmail = addReviewRequest.getReviewedEmail();
         String reviewText = addReviewRequest.getText();
         int stars = addReviewRequest.getStars();
-        MemberReview memberReview = this.memberReviewService.addMemberReview(reviewer, reviewedEmail, reviewText, stars);
-        if(memberReview == null){
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        ServiceActionResult<MemberReviewSummary> serviceActionResult = this.memberReviewService.addMemberReview(reviewer, reviewedEmail, reviewText, stars);
+        if(!serviceActionResult.isSuccessful()){
+            return new ResponseEntity(serviceActionResult,HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(memberReview, HttpStatus.CREATED);
+        return new ResponseEntity(serviceActionResult.getResult(), HttpStatus.CREATED);
     }
 
     @GetMapping

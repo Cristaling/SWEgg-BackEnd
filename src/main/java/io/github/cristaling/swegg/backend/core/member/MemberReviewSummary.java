@@ -9,6 +9,7 @@ public class MemberReviewSummary {
     private String reviewerFirstName;
     private String reviewerLastName;
 
+    private int stars;
     private String text;
     private Date dateGiven;
 
@@ -45,6 +46,14 @@ public class MemberReviewSummary {
 
     public void setReviewerLastName(String reviewerLastName) {
         this.reviewerLastName = reviewerLastName;
+    }
+
+    public int getStars() {
+        return stars;
+    }
+
+    public void setStars(int stars) {
+        this.stars = stars;
     }
 
     public String getText() {
