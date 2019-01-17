@@ -12,6 +12,7 @@ import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
+import io.github.cristaling.swegg.backend.web.requests.JobUpdateStatusRequest;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -206,4 +207,20 @@ public class JobService {
         return jobSummaries;
 
     }
+
+	public JobSummary updateJobStatus(JobUpdateStatusRequest jobUpdateStatusRequest) {
+		Job job=jobRepository.getByUuid(jobUpdateStatusRequest.getJobId());
+		job.setJobStatus(jobUpdateStatusRequest.getJobStatus());
+		jobRepository.save(job);
+		return new JobSummary(job);
+	}
+
+	public JobWithAbilities updateJob(String uuid, JobAddRequest jobAddRequest) {
+		Job job= jobRepository.getByUuid(UUID.fromString(uuid));
+		job.setJobStatus(jobAddRequest.getJobStatus());
+		job.setDescription(jobAddRequest.getDescription());
+		job.setTitle(jobAddRequest.getTitle());
+		jobRepository.save(job);
+		return new JobWithAbilities(job);
+	}
 }

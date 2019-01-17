@@ -6,23 +6,17 @@ import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.service.AbilityService;
 import io.github.cristaling.swegg.backend.service.JobService;
 import io.github.cristaling.swegg.backend.service.SecurityService;
+import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.utils.enums.JobType;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
+import io.github.cristaling.swegg.backend.web.requests.JobUpdateStatusRequest;
 import io.github.cristaling.swegg.backend.web.requests.SelectEmployeeRequest;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +38,7 @@ public class JobController {
 		this.securityService = securityService;
 	}
 
-    @PatchMapping
+    @PatchMapping("select-employee")
     public ResponseEntity selectEmployee(@RequestHeader("Authorization") String token, @RequestBody SelectEmployeeRequest selectEmployeeRequest) {
         if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -73,6 +67,22 @@ public class JobController {
 		}
 		return new ResponseEntity(job.getUuid(),HttpStatus.CREATED);
 	}
+
+
+    @PatchMapping("/{uuid}")
+    public ResponseEntity updateJob(@RequestHeader("Authorization") String token, @RequestBody JobAddRequest jobAddRequest, @PathVariable String uuid)
+    {
+
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        JobWithAbilities job = jobService.updateJob(uuid,jobAddRequest);
+
+        if (job == null) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(job,HttpStatus.CREATED);
+    }
 
 	@GetMapping("/summaries")
 	public ResponseEntity getJobSummaries(@RequestHeader("Authorization") String token,
@@ -126,6 +136,10 @@ public class JobController {
 //        return new ResponseEntity(jobSummaryList, HttpStatus.OK);
 //    }
 
+    @GetMapping("/enums")
+    public ResponseEntity getEnums(){
+	    return new ResponseEntity(JobStatus.values(),HttpStatus.OK);
+    }
     @GetMapping("/own")
     public ResponseEntity getOwnerJob(@RequestHeader("Authorization") String token, @RequestParam("email") String email) {
         if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
@@ -154,7 +168,15 @@ public class JobController {
 		}
 		return new ResponseEntity(jobSummaryList, HttpStatus.OK);
 	}
+    @PatchMapping("/update-status")
+    public ResponseEntity updateStatus(@RequestHeader("Authorization") String token, @RequestHeader JobUpdateStatusRequest jobUpdateStatusRequest){
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        JobSummary jobSummaryUpdated= jobService.updateJobStatus(jobUpdateStatusRequest);
+        return new ResponseEntity(jobSummaryUpdated, HttpStatus.OK);
 
+    }
 	@GetMapping("/top")
 	public ResponseEntity getTopRelevantJobs(@RequestHeader("Authorization") String token) {
 		if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
