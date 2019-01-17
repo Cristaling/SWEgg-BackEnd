@@ -2,6 +2,7 @@ package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.recommendations.Recommend;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import io.github.cristaling.swegg.backend.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,13 @@ public class EmailSenderService {
                 "You got the job!",
                 "You applied to a job and you were chosen by its owner. Follow this link to remember the jobs details : " +
                         environment.getProperty("domain.name") +"jobs/?job="+ job.getUuid());
+    }
+
+    public void sendNewRecommendationToMember(Recommend recommend){
+        sendEmailToEmployee(recommend.getReceiver(),
+                "You have a new notification!",
+                "Someone has recommended a new user to you. Follow this link to see that users profile page. : " +
+                        environment.getProperty("domain.name")+"/api/user/profile?email="+ recommend.getRecommendedEmail());
     }
 
     private void sendEmailToEmployee(String email, String subject, String body) {
