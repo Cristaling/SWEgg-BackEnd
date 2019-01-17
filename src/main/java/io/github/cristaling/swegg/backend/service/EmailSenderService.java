@@ -37,7 +37,7 @@ public class EmailSenderService {
         sendEmailToEmployee(recommend.getReceiver(),
                 "You have a new notification!",
                 "Someone has recommended a new user to you. Follow this link to see that users profile page. : " +
-                        environment.getProperty("domain.name")+"/api/user/profile?email="+ recommend.getRecommendedEmail());
+                        environment.getProperty("domain.name")+"/user-profile/" + recommend.getRecommendedEmail());
     }
 
     private void sendEmailToEmployee(String email, String subject, String body) {

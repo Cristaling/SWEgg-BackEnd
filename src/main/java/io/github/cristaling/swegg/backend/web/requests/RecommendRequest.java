@@ -1,14 +1,16 @@
 package io.github.cristaling.swegg.backend.web.requests;
 
+import java.util.List;
+
 public class RecommendRequest {
 
     private String recommendedEmail;
-    private String receiver;
+    private List<String> receiver;
 
     public RecommendRequest() {
     }
 
-    public RecommendRequest(String recommenderEmail, String receiver) {
+    public RecommendRequest(String recommenderEmail, List<String> receiver) {
         this.recommendedEmail = recommendedEmail;
         this.receiver = receiver;
     }
@@ -21,11 +23,11 @@ public class RecommendRequest {
         this.recommendedEmail = recommendedEmail;
     }
 
-    public String getReceiver() {
+    public List<String> getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(String receiver) {
+    public void setReceiver(List<String> receiver) {
         this.receiver = receiver;
     }
 }

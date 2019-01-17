@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/api/recommend")
@@ -32,7 +34,7 @@ public class RecommendController {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
         Member member = this.securityService.getUserByToken(token);
-        ServiceActionResult<Recommend> serviceActionResult = this.recommendService.addRecommend(recommendRequest.getReceiver(),
+        ServiceActionResult<List<Recommend>> serviceActionResult = this.recommendService.addRecommend(recommendRequest.getReceiver(),
                                                                                                 recommendRequest.getRecommendedEmail(),
                                                                                                 member.getEmail());
         if(!serviceActionResult.isSuccessful()){
