@@ -125,4 +125,18 @@ public class UserController {
 
         return new ResponseEntity(searchedUsers, HttpStatus.OK);
     }
+
+    @GetMapping("/recent")
+    public ResponseEntity getSearchedUsers(@RequestHeader("Authorization") String token) {
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        Member userByToken = securityService.getUserByToken(token);
+
+        List<ProfileResponse> resultUsers = userService.getMostRecentUsers(userByToken);
+
+        return new ResponseEntity(resultUsers, HttpStatus.OK);
+    }
+
 }
