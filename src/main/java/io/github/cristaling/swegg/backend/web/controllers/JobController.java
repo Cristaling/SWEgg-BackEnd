@@ -136,7 +136,7 @@ public class JobController {
 //        return new ResponseEntity(jobSummaryList, HttpStatus.OK);
 //    }
 
-    @GetMapping("/enums")
+    @GetMapping("/statuses")
     public ResponseEntity getEnums(){
 	    return new ResponseEntity(JobStatus.values(),HttpStatus.OK);
     }
