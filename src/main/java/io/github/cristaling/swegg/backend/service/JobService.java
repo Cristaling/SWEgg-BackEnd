@@ -191,7 +191,7 @@ public class JobService {
 		this.jobRepository.save(job);
 		this.jobRepository.flush();
 
-		emailSenderService.sendJobInviteNotificationToMember(job);
+		emailSenderService.sendJobSelectionNotificationToMember(job);
 
         return true;
     }

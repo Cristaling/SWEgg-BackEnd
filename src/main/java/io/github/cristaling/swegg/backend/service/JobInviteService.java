@@ -18,11 +18,13 @@ public class JobInviteService {
 
     private JobInviteRepository jobInviteRepository;
     private UserRepository userRepository;
+    private EmailSenderService emailSenderService;
 
     @Autowired
-    public JobInviteService(JobInviteRepository jobInviteRepository, UserRepository userRepository) {
+    public JobInviteService(JobInviteRepository jobInviteRepository, UserRepository userRepository, EmailSenderService emailSenderService) {
         this.jobInviteRepository = jobInviteRepository;
         this.userRepository = userRepository;
+        this.emailSenderService = emailSenderService;
     }
 
     public boolean addJobInvite(Job job, String email){
@@ -36,6 +38,9 @@ public class JobInviteService {
         jobInvite.setMember(member);
         this.jobInviteRepository.save(jobInvite);
         this.jobInviteRepository.flush();
+
+        emailSenderService.sendJobInviteNotificationToMember(jobInvite);
+
         return true;
     }
 
