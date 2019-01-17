@@ -25,7 +25,7 @@ public class ServiceActionResult<T> {
         return this.error == null;
     }
 
-    public String getError(){
+    public int getError(){
         return this.error.getValue();
     }
 }

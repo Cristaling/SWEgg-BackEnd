@@ -5,27 +5,27 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ErrorMessages {
 
-    USER_DOES_NOT_EXIST("User does not exist"),
+    USER_DOES_NOT_EXIST(100),
 
-    REVIEW_ALREADY_EXISTS("Review already exists"),
-    JOB_DOES_NOT_EXIST("Job doesn't exist"),
-    JOB_IS_NOT_DONE("Job is not done yet"),
-    REVIEW_STARS_MISSING("Cant review without giving stars"),
+    REVIEW_ALREADY_EXISTS(101),
+    JOB_DOES_NOT_EXIST(102),
+    JOB_IS_NOT_DONE(103),
+    REVIEW_STARS_MISSING(104),
 
-    RECOMMENDATION_ALREADY_EXISTS("There is already a recommendation of the user between you two."),
-    PLEASE_SPECIFY_EMAIL("The recommandation cannot have empty fields");
+    RECOMMENDATION_ALREADY_EXISTS(105),
+    PLEASE_SPECIFY_EMAIL(106);
 
-    String value;
+    int value;
 
-    ErrorMessages(String value) {
+    ErrorMessages(int value) {
         this.value = value;
     }
 
-    public String getValue() {
+    public int getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(int value) {
         this.value = value;
     }
 }
