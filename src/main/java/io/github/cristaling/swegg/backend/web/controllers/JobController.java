@@ -169,7 +169,7 @@ public class JobController {
 		return new ResponseEntity(jobSummaryList, HttpStatus.OK);
 	}
     @PatchMapping("/update-status")
-    public ResponseEntity updateStatus(@RequestHeader("Authorization") String token, @RequestHeader JobUpdateStatusRequest jobUpdateStatusRequest){
+    public ResponseEntity updateStatus(@RequestHeader("Authorization") String token, @RequestBody JobUpdateStatusRequest jobUpdateStatusRequest){
         if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
