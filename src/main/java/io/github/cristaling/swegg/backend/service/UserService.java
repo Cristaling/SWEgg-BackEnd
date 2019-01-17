@@ -50,6 +50,15 @@ public class UserService {
 		return profileResponse;
 	}
 
+	protected ProfileResponse getProfileInternal(String email) {
+		Member user = userRepository.getMemberByEmail(email);
+		if (user == null) {
+			return null;
+		}
+		MemberData userData = user.getMemberData();
+		return new ProfileResponse(userData, user.getEmail());
+	}
+
 	public ProfileResponse updateProfile(UpdateProfileRequest profileRequest, Member userByToken) {
 		Member user = userRepository.getMemberByEmail(profileRequest.getEmail());
 		if (user == null) {
