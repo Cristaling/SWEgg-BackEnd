@@ -2,21 +2,25 @@ package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.abilities.Ability;
 import io.github.cristaling.swegg.backend.core.abilities.AbilityUse;
+import io.github.cristaling.swegg.backend.core.abilities.Endorsement;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.repositories.AbilityRepository;
 import io.github.cristaling.swegg.backend.repositories.AbilityUseRepository;
+import io.github.cristaling.swegg.backend.repositories.EndorsementRepository;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
+import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,17 +35,19 @@ public class JobService {
 	private JobApplicationRepository jobApplicationRepository;
 	private AbilityUseRepository abilityUseRepository;
 	private AbilityRepository abilityRepository;
+	private EndorsementRepository endorsementRepository;
 	private EmailSenderService emailSenderService;
 
 	private AbilityService abilityService;
 
 	@Autowired
-	public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, EmailSenderService emailSenderService, AbilityService abilityService) {
+	public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, EndorsementRepository endorsementRepository, EmailSenderService emailSenderService, AbilityService abilityService) {
 		this.jobRepository = jobRepository;
 		this.userRepository = userRepository;
 		this.jobApplicationRepository = jobApplicationRepository;
 		this.abilityUseRepository = abilityUseRepository;
 		this.abilityRepository = abilityRepository;
+		this.endorsementRepository = endorsementRepository;
 		this.emailSenderService = emailSenderService;
 		this.abilityService = abilityService;
 	}
@@ -206,4 +212,48 @@ public class JobService {
         return jobSummaries;
 
     }
+
+	public List<ProfileResponse> getBestUsersForJob(UUID uuid) {
+
+		Job job;
+
+		try {
+			job = this.jobRepository.getOne(uuid);
+		} catch (EntityNotFoundException ex) {
+			return null;
+		}
+
+		List<AbilityUse> abilityUses = this.abilityUseRepository.getAbilityUsesByJob(job);
+		List<Ability> abilities = abilityUses.stream().map(AbilityUse::getAbility).collect(Collectors.toList());
+
+		Map<Member, Long> map = abilities.stream()
+				.flatMap(
+						ability -> this.endorsementRepository.getAllByAbility(ability).stream()
+				)
+				.collect(
+						Collectors.groupingBy(
+								Endorsement::getEndorsed,
+								Collectors.mapping(
+										Endorsement::getAbility,
+										Collectors.counting()
+								)
+						)
+				);
+
+		List<ProfileResponse> members = map.entrySet().stream()
+				.sorted(
+						(o1, o2) -> o2.getValue().compareTo(o1.getValue())
+				)
+				.map(entry -> entry.getKey())
+				.map((member) -> new ProfileResponse(member.getMemberData(), member.getEmail()))
+				.collect(Collectors.toList());
+
+		int listSize = members.size();
+
+		if (listSize == 0) {
+			return new ArrayList<>();
+		}
+
+		return members.subList(0, Math.min(5, listSize));
+	}
 }
