@@ -71,7 +71,7 @@ public class JobController {
 		if (job == null) {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity(HttpStatus.CREATED);
+		return new ResponseEntity(job.getUuid(),HttpStatus.CREATED);
 	}
 
 	@GetMapping("/summaries")
@@ -110,6 +110,35 @@ public class JobController {
 		return new ResponseEntity(JobType.values(), HttpStatus.OK);
 	}
 
+//    @GetMapping("/related")
+//    public ResponseEntity getRelatedJobs(@RequestHeader("Authorization") String token, @RequestParam("email") String email) {
+//        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+//            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+//        }
+//        Member userByToken = securityService.getUserByToken(token);
+//        if (userByToken == null) {
+//            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+//        }
+//        List<JobSummary> jobSummaryList = jobService.getUserJobs(email, userByToken);
+//        if (jobSummaryList == null) {
+//            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+//        }
+//        return new ResponseEntity(jobSummaryList, HttpStatus.OK);
+//    }
+
+    @GetMapping("/own")
+    public ResponseEntity getOwnerJob(@RequestHeader("Authorization") String token, @RequestParam("email") String email) {
+        if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        Member userByToken = securityService.getUserByToken(token);
+        if (userByToken == null) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        List<JobSummary> jobSummaryList = jobService.getOpenJobsForOwner(email);
+
+        return new ResponseEntity(jobSummaryList, HttpStatus.OK);
+    }
 	@GetMapping("/related")
 	public ResponseEntity getRelatedJobs(@RequestHeader("Authorization") String token, @RequestParam("email") String email) {
 		if (!securityService.canAccessRole(token, MemberRole.CLIENT)) {

@@ -193,7 +193,17 @@ public class JobService {
 
 		emailSenderService.sendJobInviteNotificationToMember(job);
 
-		return true;
-	}
+        return true;
+    }
 
+    public List<JobSummary> getOpenJobsForOwner(String email){
+        Member owner = this.userRepository.getMemberByEmail(email);
+        List<Job> jobList= jobRepository.getJobsByOwnerAndJobStatus(owner,JobStatus.OPEN);
+        List<JobSummary> jobSummaries=new ArrayList<>();
+        for(Job job : jobList){
+            jobSummaries.add(new JobSummary(job));
+        }
+        return jobSummaries;
+
+    }
 }
