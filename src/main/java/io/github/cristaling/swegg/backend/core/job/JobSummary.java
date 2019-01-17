@@ -17,7 +17,7 @@ public class JobSummary {
     private String description;
     private String employeeName;
     private String employeeEmail;
-    private JobStatus status;
+    private JobStatus jobStatus;
     private List<Ability> abilities;
 
     public JobSummary() {
@@ -29,7 +29,7 @@ public class JobSummary {
         this.title = job.getTitle();
         this.ownerEmail = job.getOwner().getEmail();
         this.ownerName = job.getOwner().getMemberData().getFirstName() + " " + job.getOwner().getMemberData().getLastName();
-        this.status=job.getJobStatus();
+        this.jobStatus=job.getJobStatus();
         Member employee = job.getEmployee();
         if (employee != null) {
             this.employeeName = employee.getMemberData().getFirstName() + " " + employee.getMemberData().getLastName();
@@ -44,7 +44,7 @@ public class JobSummary {
         this.ownerEmail = jobWithAbilities.getOwner().getEmail();
         this.ownerName = jobWithAbilities.getOwner().getMemberData().getFirstName() + " " + jobWithAbilities.getOwner().getMemberData().getLastName();
         this.abilities = jobWithAbilities.getAbilities();
-        this.status=jobWithAbilities.getJobStatus();
+        this.jobStatus=jobWithAbilities.getJobStatus();
         Member employee = jobWithAbilities.getEmployee();
         if (employee != null) {
             this.employeeName = employee.getMemberData().getFirstName() + " " + employee.getMemberData().getLastName();
@@ -116,11 +116,11 @@ public class JobSummary {
         this.employeeEmail = employeeEmail;
     }
 
-    public JobStatus getStatus() {
-        return status;
+    public JobStatus getJobStatus() {
+        return jobStatus;
     }
 
-    public void setStatus(JobStatus status) {
-        this.status = status;
+    public void setJobStatus(JobStatus jobStatus) {
+        this.jobStatus = jobStatus;
     }
 }
