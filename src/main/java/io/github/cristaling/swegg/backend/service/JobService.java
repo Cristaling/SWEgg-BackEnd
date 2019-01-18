@@ -6,6 +6,7 @@ import io.github.cristaling.swegg.backend.core.abilities.Endorsement;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.AbilityRepository;
 import io.github.cristaling.swegg.backend.repositories.AbilityUseRepository;
 import io.github.cristaling.swegg.backend.repositories.EndorsementRepository;
@@ -23,10 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -215,6 +213,17 @@ public class JobService {
 		job.setJobStatus(JobStatus.ACCEPTED);
 		this.jobRepository.save(job);
 		this.jobRepository.flush();
+
+		notificationService.sendDataSecured(employee,"job/select", new JobSummary(job));
+
+		Notification notification= new Notification();
+		notification.setDate(new Date());
+		notification.setMember(employee);
+		notification.setRead(false);
+		notification.setText("You just got accepted by : " + job.getOwner().getMemberData().getLastName() + " " + job.getOwner().getMemberData().getFirstName());
+
+		this.notificationService.addNotification(notification);
+
 
 		emailSenderService.sendJobSelectionNotificationToMember(job);
 
