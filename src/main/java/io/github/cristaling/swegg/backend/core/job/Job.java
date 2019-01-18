@@ -19,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -53,6 +54,8 @@ public class Job {
     @NotNull
     private String description;
 
+    private Date doneDate;
+
     public Job() {
     }
 
@@ -78,6 +81,16 @@ public class Job {
         this.jobType = jobWithAbilities.getJobType();
         this.owner = jobWithAbilities.getOwner();
         this.title = jobWithAbilities.getTitle();
+    }
+
+    public Member getOther(Member member) {
+        if (member.equals(this.owner)) {
+            return this.employee;
+        }
+        if (member.equals(this.employee)) {
+            return this.owner;
+        }
+        return null;
     }
 
     public UUID getUuid() {
@@ -126,5 +139,13 @@ public class Job {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Date getDoneDate() {
+        return doneDate;
+    }
+
+    public void setDoneDate(Date doneDate) {
+        this.doneDate = doneDate;
     }
 }

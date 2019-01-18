@@ -13,6 +13,7 @@ import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.requests.JobUpdateStatusRequest;
 import io.github.cristaling.swegg.backend.web.requests.SelectEmployeeRequest;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
+import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -189,6 +190,27 @@ public class JobController {
 		List<JobSummary> result = this.jobService.getTopRelevantJobs(userAbilities);
 
 		return new ResponseEntity(result, HttpStatus.OK);
+	}
+
+	@GetMapping("/best-users")
+	public ResponseEntity getBestUsersForJob(@RequestHeader("Authorization") String token, String jobUUID) {
+		if (!this.securityService.canAccessRole(token, MemberRole.CLIENT)) {
+			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+		}
+
+		UUID uuid = UUID.fromString(jobUUID);
+
+		if (uuid == null) {
+			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		}
+
+		List<ProfileResponse> response = this.jobService.getBestUsersForJob(uuid);
+
+		if (response == null) {
+			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+		}
+
+		return new ResponseEntity(response, HttpStatus.OK);
 	}
 
 }
