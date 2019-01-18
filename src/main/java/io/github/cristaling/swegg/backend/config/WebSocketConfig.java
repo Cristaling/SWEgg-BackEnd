@@ -12,13 +12,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
-		config.enableSimpleBroker("/event");
+		config.enableSimpleBroker("/events");
 //		config.setApplicationDestinationPrefixes("/app");
 	}
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/la-negru-websocket").withSockJS();
+		registry.addEndpoint("/la-negru-websocket")
+				.setAllowedOrigins("*")
+				.withSockJS();
 	}
 
 }

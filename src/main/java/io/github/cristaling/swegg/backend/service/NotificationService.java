@@ -63,22 +63,37 @@ public class NotificationService {
 	}
 
 	public void addNotification(Notification notification) {
-		sendData(notification.getMember(), "/notifications", notification);
+		sendDataSecured(notification.getMember(), "/notifications", notification);
 		this.notificationRepository.save(notification);
 	}
 
 	/**
-	 * @param member Member to send data to
+	 * @param member Member to send data to by token
 	 * @param endpoint Endpoint starting in '/' to where to send data (will pe prefixed by '/events/{token}')
 	 * @param body Data to send
 	 */
-	public void sendData(Member member, String endpoint, Object body) {
+	public void sendDataSecured(Member member, String endpoint, Object body) {
 
 		String token = SecurityUtils.getTokenByUUID(member.getUuid().toString());
 
 		StringBuilder destination = new StringBuilder();
 		destination.append("/events/");
 		destination.append(token);
+		destination.append(endpoint);
+
+		simpMessagingTemplate.convertAndSend(destination.toString(), body);
+	}
+
+	/**
+	 * @param member Member to send data to by email
+	 * @param endpoint Endpoint starting in '/' to where to send data (will pe prefixed by '/events/{token}')
+	 * @param body Data to send
+	 */
+	public void sendDataUnsecured(Member member, String endpoint, Object body) {
+
+		StringBuilder destination = new StringBuilder();
+		destination.append("/events/");
+		destination.append(member.getEmail());
 		destination.append(endpoint);
 
 		simpMessagingTemplate.convertAndSend(destination.toString(), body);
