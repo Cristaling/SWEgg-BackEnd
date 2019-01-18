@@ -12,6 +12,7 @@ import io.github.cristaling.swegg.backend.repositories.EndorsementRepository;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.schedulers.NewsletterTask;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.requests.JobUpdateStatusRequest;
@@ -42,9 +43,19 @@ public class JobService {
 	private NotificationService notificationService;
 
 	private AbilityService abilityService;
+	private NewsletterTask newsletterTask;
 
 	@Autowired
-	public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, EndorsementRepository endorsementRepository, EmailSenderService emailSenderService, NotificationService notificationService, AbilityService abilityService) {
+	public JobService(JobRepository jobRepository,
+					  UserRepository userRepository,
+					  JobApplicationRepository jobApplicationRepository,
+					  AbilityUseRepository abilityUseRepository,
+					  AbilityRepository abilityRepository,
+					  EndorsementRepository endorsementRepository,
+					  EmailSenderService emailSenderService,
+					  NotificationService notificationService,
+					  AbilityService abilityService,
+					  NewsletterTask newsletterTask) {
 		this.jobRepository = jobRepository;
 		this.userRepository = userRepository;
 		this.jobApplicationRepository = jobApplicationRepository;
@@ -54,6 +65,7 @@ public class JobService {
 		this.emailSenderService = emailSenderService;
 		this.notificationService = notificationService;
 		this.abilityService = abilityService;
+		this.newsletterTask = newsletterTask;
 	}
 
 	private JobWithAbilities addAbilitiesToJob(Job job) {
@@ -102,6 +114,8 @@ public class JobService {
 				this.abilityUseRepository.save(abilityUse);
 			}
 		}
+
+		newsletterTask.addJob(job);
 
 		return addAbilitiesToJob(job);
 	}

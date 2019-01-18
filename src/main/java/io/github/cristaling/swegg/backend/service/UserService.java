@@ -153,4 +153,8 @@ public class UserService {
 		return response;
 	}
 
+	public List<Member> getMembersForSubscriptions(){
+		return userRepository.findAll();
+	}
+
 }

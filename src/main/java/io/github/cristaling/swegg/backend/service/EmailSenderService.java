@@ -28,6 +28,13 @@ public class EmailSenderService {
         this.environment = environment;
     }
 
+    public void sendnewsletter(Member member){
+        sendEmailToEmployee(member.getEmail(),
+                "Newly added jobs!",
+                "Since you last received a newsleter, there have benn aded new jobs. Follow this link to see the jobs : " +
+                        environment.getProperty("domain.name") +"jobs");
+    }
+
     public void sendJobSelectionNotificationToMember(Job job) {
         Member member = job.getEmployee();
         sendEmailToEmployee(member.getEmail(),
