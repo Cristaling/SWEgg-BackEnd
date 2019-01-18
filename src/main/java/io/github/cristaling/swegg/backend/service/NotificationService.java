@@ -55,6 +55,7 @@ public class NotificationService {
 		}
 
 		notification.setRead(true);
+		this.notificationRepository.save(notification);
 	}
 
 	public void addNotification(Member member, String text) {
