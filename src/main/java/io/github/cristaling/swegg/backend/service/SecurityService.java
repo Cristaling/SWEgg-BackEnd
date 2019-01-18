@@ -12,6 +12,8 @@ import io.github.cristaling.swegg.backend.utils.ImageUtils;
 import io.github.cristaling.swegg.backend.utils.SecurityUtils;
 import io.github.cristaling.swegg.backend.utils.enums.MemberRole;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -60,6 +62,10 @@ public class SecurityService {
 		}
 
 		if (member == null) {
+			return null;
+		}
+
+		if (!member.isVerified()) {
 			return null;
 		}
 
@@ -179,4 +185,17 @@ public class SecurityService {
 
 		return user.get();
 	}
+
+    public ResponseEntity verifyUserAccount(String token) {
+		Member member = getUserByToken(token);
+		if(member == null){
+			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+		}
+		if(member.isVerified()){
+			return new ResponseEntity(HttpStatus.CONFLICT);
+		}
+		member.setVerified(true);
+		userRepository.save(member);
+		return new ResponseEntity(HttpStatus.OK);
+    }
 }

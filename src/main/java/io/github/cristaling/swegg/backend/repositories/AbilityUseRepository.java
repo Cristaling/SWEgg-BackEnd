@@ -1,5 +1,6 @@
 package io.github.cristaling.swegg.backend.repositories;
 
+import io.github.cristaling.swegg.backend.core.abilities.Ability;
 import io.github.cristaling.swegg.backend.core.abilities.AbilityUse;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,8 @@ import java.util.UUID;
 
 @Repository
 public interface AbilityUseRepository extends JpaRepository<AbilityUse, UUID> {
+
     List<AbilityUse> getAbilityUsesByJob(Job job);
+    List<AbilityUse> getAbilityUsesByAbility(Ability ability);
 
 }

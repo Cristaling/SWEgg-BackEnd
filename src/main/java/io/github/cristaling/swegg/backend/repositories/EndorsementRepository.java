@@ -14,5 +14,6 @@ public interface EndorsementRepository extends JpaRepository<Endorsement, UUID> 
 
 	Endorsement getByAbilityAndEndorsedAndEndorser(Ability ability, Member endorsed, Member endorser);
 	List<Endorsement> getByEndorsed(Member endorsed);
+	List<Endorsement> getAllByAbility(Ability ability);
 
 }

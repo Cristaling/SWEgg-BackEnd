@@ -85,11 +85,12 @@ public class AbilityController {
 		Member endorser = this.securityService.getUserByToken(token);
 		Ability ability = this.abilityService.getAbilityByName(request.getAbilityName());
 
+		// Cannot be null
 		if (ability == null) {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		}
 
-		this.abilityService.toggleEndorsement(endorser, request.getEmail(), ability.getUuid());
+		this.abilityService.toggleEndorsement(endorser, request.getEmail(), ability);
 		return new ResponseEntity(HttpStatus.OK);
 	}
 

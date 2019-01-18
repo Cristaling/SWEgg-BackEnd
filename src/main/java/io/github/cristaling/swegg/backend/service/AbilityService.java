@@ -3,17 +3,19 @@ package io.github.cristaling.swegg.backend.service;
 import io.github.cristaling.swegg.backend.core.abilities.Ability;
 import io.github.cristaling.swegg.backend.core.abilities.Endorsement;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.AbilityRepository;
 import io.github.cristaling.swegg.backend.repositories.EndorsementRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.sockets.core.EndorsementChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class AbilityService {
@@ -23,11 +25,14 @@ public class AbilityService {
 	private AbilityRepository abilityRepository;
 	private EndorsementRepository endorsementRepository;
 
+	private NotificationService notificationService;
+
 	@Autowired
-	public AbilityService(UserRepository userRepository, AbilityRepository abilityRepository, EndorsementRepository endorsementRepository) {
+	public AbilityService(UserRepository userRepository, AbilityRepository abilityRepository, EndorsementRepository endorsementRepository, NotificationService notificationService) {
 		this.userRepository = userRepository;
 		this.abilityRepository = abilityRepository;
 		this.endorsementRepository = endorsementRepository;
+		this.notificationService = notificationService;
 	}
 
 	public List<Ability> getAbilitiesByCategory(String category) {
@@ -77,7 +82,7 @@ public class AbilityService {
 			if (ability != null) {
 				return null;
 			}
-		} catch (EntityNotFoundException ex ){
+		} catch (EntityNotFoundException ex) {
 
 		}
 
@@ -88,7 +93,7 @@ public class AbilityService {
 		return ability;
 	}
 
-	public void toggleEndorsement(Member endorser, String endorsedEmail, UUID abilityUUID) {
+	public void toggleEndorsement(Member endorser, String endorsedEmail, Ability ability) {
 
 		Member endorsed;
 		try {
@@ -101,12 +106,21 @@ public class AbilityService {
 			return;
 		}
 
-		Ability ability = this.abilityRepository.getOne(abilityUUID);
-
 		Endorsement existent = this.endorsementRepository.getByAbilityAndEndorsedAndEndorser(ability, endorsed, endorser);
+
 
 		if (existent != null) {
 			this.endorsementRepository.delete(existent);
+			EndorsementChange endorsementChange = new EndorsementChange();
+			endorsementChange.setAbility(existent.getAbility().getName());
+			endorsementChange.setEmail(endorser.getEmail());
+			this.notificationService.sendDataSecured(endorsed, "/endorsement/delete", endorsementChange);
+			Notification notification= new Notification();
+			notification.setDate(new Date());
+			notification.setMember(endorsed);
+			notification.setRead(false);
+			notification.setText("Your ability just got un-endorsed : " + ability.getName());
+			this.notificationService.addNotification(notification);
 			return;
 		}
 
@@ -116,6 +130,17 @@ public class AbilityService {
 		endorsement.setEndorser(endorser);
 
 		this.endorsementRepository.save(endorsement);
+
+		EndorsementChange endorsementChange = new EndorsementChange();
+		endorsementChange.setAbility(ability.getName());
+		endorsementChange.setEmail(endorser.getEmail());
+		this.notificationService.sendDataSecured(endorsed, "/endorsement/add", endorsementChange);
+		Notification notification= new Notification();
+		notification.setDate(new Date());
+		notification.setMember(endorsed);
+		notification.setRead(false);
+		notification.setText("Your ability just got endorsed : " + ability.getName());
+		this.notificationService.addNotification(notification);
 	}
 
 	public Ability getAbilityByName(String abilityName) {
@@ -130,4 +155,17 @@ public class AbilityService {
 		return addAbility(abilityName, "General");
 	}
 
+	public List<Ability> getMemberAbilities(Member member) {
+
+		List<Ability> result = new ArrayList<>();
+		List<Endorsement> endorsements = this.endorsementRepository.getByEndorsed(member);
+
+		for (Endorsement endorsement : endorsements) {
+			if (!result.contains(endorsement.getAbility())) {
+				result.add(endorsement.getAbility());
+			}
+		}
+
+		return result;
+	}
 }

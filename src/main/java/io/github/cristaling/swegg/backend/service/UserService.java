@@ -1,12 +1,17 @@
 package io.github.cristaling.swegg.backend.service;
 
+import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.member.MemberData;
+import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserDataRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.web.requests.UpdateProfileRequest;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
+import io.github.cristaling.swegg.backend.web.responses.UserSummaryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,16 +19,24 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
+
 	private UserRepository userRepository;
 	private UserDataRepository userDataRepository;
 
+	private JobRepository jobRepository;
+
 	@Autowired
-	public UserService(UserRepository userRepository, UserDataRepository userDataRepository) {
+	public UserService(UserRepository userRepository, UserDataRepository userDataRepository, JobRepository jobRepository) {
 		this.userRepository = userRepository;
 		this.userDataRepository = userDataRepository;
+		this.jobRepository = jobRepository;
 	}
 
 	/**
@@ -44,6 +57,15 @@ public class UserService {
 			return profileResponse;
 		}
 		return profileResponse;
+	}
+
+	protected ProfileResponse getProfileInternal(String email) {
+		Member user = userRepository.getMemberByEmail(email);
+		if (user == null) {
+			return null;
+		}
+		MemberData userData = user.getMemberData();
+		return new ProfileResponse(userData, user.getEmail());
 	}
 
 	public ProfileResponse updateProfile(UpdateProfileRequest profileRequest, Member userByToken) {
@@ -99,4 +121,40 @@ public class UserService {
 		}
 		return picture;
 	}
+
+	@Transactional
+    public List<UserSummaryResponse> getSearchedUsers(String name, int page, int count) {
+		List<UserSummaryResponse> userSummaryResponses = new ArrayList<>();
+		List<Member> members= this.userRepository.getMemberByCompleteNameIgnoreCase(PageRequest.of(page, count), name.toLowerCase()).getContent();
+		for(Member member : members) {
+			UserSummaryResponse userSummaryResponse = new UserSummaryResponse();
+			userSummaryResponse.setEmail(member.getEmail());
+			userSummaryResponse.setFirstName(member.getMemberData().getFirstName());
+			userSummaryResponse.setLastName(member.getMemberData().getLastName());
+			userSummaryResponses.add(userSummaryResponse);
+		}
+		return userSummaryResponses;
+	}
+
+	public List<ProfileResponse> getMostRecentUsers(Member userByToken) {
+
+		List<Job> jobs = this.jobRepository.getAllByOwnerAndJobStatus(userByToken, JobStatus.DONE);
+		List<Job> jobsDone = this.jobRepository.getAllByEmployeeAndJobStatus(userByToken, JobStatus.DONE);
+
+		jobs.addAll(jobsDone);
+
+		List<ProfileResponse> response = jobs.stream()
+				.sorted(Comparator.comparing(Job::getDoneDate).reversed())
+				.limit(5)
+				.map((job) -> job.getOther(userByToken))
+				.map((member) -> this.getProfile(member.getEmail(), userByToken))
+				.collect(Collectors.toList());
+
+		return response;
+	}
+
+	public List<Member> getMembersForSubscriptions(){
+		return userRepository.findAll();
+	}
+
 }
