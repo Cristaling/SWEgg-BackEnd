@@ -69,7 +69,7 @@ public class JobController {
 	}
 
 
-    @PatchMapping("/{uuid}")
+    @PatchMapping("{uuid}")
     public ResponseEntity updateJob(@RequestHeader("Authorization") String token, @RequestBody JobAddRequest jobAddRequest, @PathVariable String uuid)
     {
 
