@@ -24,12 +24,14 @@ public class MemberReviewService {
     private MemberReviewRepository memberReviewRepository;
     private UserRepository userRepository;
     private JobRepository jobRepository;
+    private EmailSenderService emailSenderService;
 
     @Autowired
-    public MemberReviewService(MemberReviewRepository memberReviewRepository, UserRepository userRepository, JobRepository jobRepository) {
+    public MemberReviewService(MemberReviewRepository memberReviewRepository, UserRepository userRepository, JobRepository jobRepository, EmailSenderService emailSenderService) {
         this.memberReviewRepository = memberReviewRepository;
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
+        this.emailSenderService = emailSenderService;
     }
 
     public ServiceActionResult<MemberReviewSummary> addMemberReview(Member reviewer, String reviewedEmail, String text, int stars){
@@ -77,6 +79,8 @@ public class MemberReviewService {
 
         this.memberReviewRepository.save(memberReview);
         this.memberReviewRepository.flush();
+
+        emailSenderService.sendReviewNotificationToMember(memberReview);
 
         return result;
     }
