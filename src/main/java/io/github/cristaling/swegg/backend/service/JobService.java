@@ -39,10 +39,12 @@ public class JobService {
 	private EndorsementRepository endorsementRepository;
 	private EmailSenderService emailSenderService;
 
+	private NotificationService notificationService;
+
 	private AbilityService abilityService;
 
 	@Autowired
-	public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, EndorsementRepository endorsementRepository, EmailSenderService emailSenderService, AbilityService abilityService) {
+	public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, EndorsementRepository endorsementRepository, EmailSenderService emailSenderService, NotificationService notificationService, AbilityService abilityService) {
 		this.jobRepository = jobRepository;
 		this.userRepository = userRepository;
 		this.jobApplicationRepository = jobApplicationRepository;
@@ -50,6 +52,7 @@ public class JobService {
 		this.abilityRepository = abilityRepository;
 		this.endorsementRepository = endorsementRepository;
 		this.emailSenderService = emailSenderService;
+		this.notificationService = notificationService;
 		this.abilityService = abilityService;
 	}
 
@@ -99,6 +102,7 @@ public class JobService {
 				this.abilityUseRepository.save(abilityUse);
 			}
 		}
+
 		return addAbilitiesToJob(job);
 	}
 

@@ -6,6 +6,7 @@ import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.repositories.AbilityRepository;
 import io.github.cristaling.swegg.backend.repositories.EndorsementRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.sockets.core.EndorsementChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,6 @@ import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class AbilityService {
@@ -23,11 +23,14 @@ public class AbilityService {
 	private AbilityRepository abilityRepository;
 	private EndorsementRepository endorsementRepository;
 
+	private NotificationService notificationService;
+
 	@Autowired
-	public AbilityService(UserRepository userRepository, AbilityRepository abilityRepository, EndorsementRepository endorsementRepository) {
+	public AbilityService(UserRepository userRepository, AbilityRepository abilityRepository, EndorsementRepository endorsementRepository, NotificationService notificationService) {
 		this.userRepository = userRepository;
 		this.abilityRepository = abilityRepository;
 		this.endorsementRepository = endorsementRepository;
+		this.notificationService = notificationService;
 	}
 
 	public List<Ability> getAbilitiesByCategory(String category) {
@@ -88,7 +91,7 @@ public class AbilityService {
 		return ability;
 	}
 
-	public void toggleEndorsement(Member endorser, String endorsedEmail, UUID abilityUUID) {
+	public void toggleEndorsement(Member endorser, String endorsedEmail, Ability ability) {
 
 		Member endorsed;
 		try {
@@ -101,12 +104,15 @@ public class AbilityService {
 			return;
 		}
 
-		Ability ability = this.abilityRepository.getOne(abilityUUID);
-
 		Endorsement existent = this.endorsementRepository.getByAbilityAndEndorsedAndEndorser(ability, endorsed, endorser);
+
 
 		if (existent != null) {
 			this.endorsementRepository.delete(existent);
+			EndorsementChange endorsementChange = new EndorsementChange();
+			endorsementChange.setAbility(existent.getAbility().getName());
+			endorsementChange.setEmail(endorser.getEmail());
+			this.notificationService.sendDataUnsecured(endorsed, "/endorsement/delete", endorsementChange);
 			return;
 		}
 
@@ -116,6 +122,11 @@ public class AbilityService {
 		endorsement.setEndorser(endorser);
 
 		this.endorsementRepository.save(endorsement);
+
+		EndorsementChange endorsementChange = new EndorsementChange();
+		endorsementChange.setAbility(ability.getName());
+		endorsementChange.setEmail(endorser.getEmail());
+		this.notificationService.sendDataUnsecured(endorsed, "/endorsement/add", endorsementChange);
 	}
 
 	public Ability getAbilityByName(String abilityName) {
