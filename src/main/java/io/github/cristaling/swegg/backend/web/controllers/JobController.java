@@ -213,4 +213,14 @@ public class JobController {
 		return new ResponseEntity(response, HttpStatus.OK);
 	}
 
+	@GetMapping("/{uuid}/abilities")
+	public ResponseEntity getJobAbilities(@RequestHeader("Authorization") String token,  @PathVariable("uuid") String uuid) {
+		if (!this.securityService.canAccessRole(token, MemberRole.CLIENT)) {
+			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+		}
+
+		List<Ability> abilities = this.jobService.getAbilitiesForJob(UUID.fromString(uuid));
+
+		return new ResponseEntity(abilities, HttpStatus.OK);
+	}
 }

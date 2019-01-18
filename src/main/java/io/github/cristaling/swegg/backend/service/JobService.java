@@ -277,4 +277,8 @@ public class JobService {
 		jobRepository.save(job);
 		return new JobWithAbilities(job);
 	}
+
+	public List<Ability> getAbilitiesForJob(UUID jobUuid) {
+		return this.abilityUseRepository.getAbilityUsesByJob(this.jobRepository.getByUuid(jobUuid)).stream().map(AbilityUse::getAbility).collect(Collectors.toList());
+	}
 }
