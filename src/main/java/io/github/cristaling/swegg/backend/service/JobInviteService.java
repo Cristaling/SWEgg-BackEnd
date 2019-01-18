@@ -4,12 +4,14 @@ import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobInvite;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.JobInviteRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,12 +21,17 @@ public class JobInviteService {
     private JobInviteRepository jobInviteRepository;
     private UserRepository userRepository;
     private EmailSenderService emailSenderService;
+    private NotificationService notificationService;
 
     @Autowired
-    public JobInviteService(JobInviteRepository jobInviteRepository, UserRepository userRepository, EmailSenderService emailSenderService) {
+    public JobInviteService(JobInviteRepository jobInviteRepository,
+                            UserRepository userRepository,
+                            EmailSenderService emailSenderService,
+                            NotificationService notificationService) {
         this.jobInviteRepository = jobInviteRepository;
         this.userRepository = userRepository;
         this.emailSenderService = emailSenderService;
+        this.notificationService = notificationService;
     }
 
     public boolean addJobInvite(Job job, String email){
@@ -38,6 +45,15 @@ public class JobInviteService {
         jobInvite.setMember(member);
         this.jobInviteRepository.save(jobInvite);
         this.jobInviteRepository.flush();
+
+        notificationService.sendDataSecured(job.getOwner(),"jobinvite/add", jobInvite);
+
+        Notification notification= new Notification();
+        notification.setDate(new Date());
+        notification.setMember(member);
+        notification.setRead(false);
+        notification.setText("You just got invited to a job : " + job.getTitle());
+        this.notificationService.addNotification(notification);
 
         emailSenderService.sendJobInviteNotificationToMember(jobInvite);
 
