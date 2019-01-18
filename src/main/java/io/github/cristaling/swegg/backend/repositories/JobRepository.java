@@ -19,6 +19,7 @@ public interface JobRepository extends JpaRepository<Job, UUID> {
     List<Job>getByOwner(Member member);
     List<Job> getJobsByTitleContainingIgnoreCase(String title);
     Page<Job> getJobsByTitleContainingIgnoreCase(Pageable pageRequest, String title);
+    Job getByUuid(UUID id);
 //    @Query(value = "select * from jobs j inner join ability_uses a on j.uuid = a.job_uuid where j.uuid=?1", nativeQuery = true)
 //    Job getJobWithAbilities(UUID jobId);
 }
