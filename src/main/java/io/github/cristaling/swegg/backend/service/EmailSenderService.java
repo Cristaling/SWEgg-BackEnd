@@ -1,7 +1,10 @@
 package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
+import io.github.cristaling.swegg.backend.core.job.JobApplication;
+import io.github.cristaling.swegg.backend.core.job.JobInvite;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.member.MemberReview;
 import io.github.cristaling.swegg.backend.core.recommendations.Recommend;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
 import io.github.cristaling.swegg.backend.utils.SecurityUtils;
@@ -25,7 +28,7 @@ public class EmailSenderService {
         this.environment = environment;
     }
 
-    public void sendJobInviteNotificationToMember(Job job) {
+    public void sendJobSelectionNotificationToMember(Job job) {
         Member member = job.getEmployee();
         sendEmailToEmployee(member.getEmail(),
                 "You got the job!",
@@ -55,5 +58,36 @@ public class EmailSenderService {
                 "Thank you for joining LaNegru!",
                 "Please follow the link down below to confirm your account on the website : " +
                         environment.getProperty("user.confirmation.link") + SecurityUtils.getTokenByUUID(member.getUuid().toString()));
+    }
+
+    public void sendReviewNotificationToMember(MemberReview review) {
+        Member reviewer = review.getReviewer();
+        sendEmailToEmployee(review.getReviewed().getEmail(),
+                "You have received a new review!",
+                "User : " + reviewer.getMemberData().getFirstName() + " " + reviewer.getMemberData().getLastName() +
+                        " with email : " + reviewer.getEmail() +
+                        " has just given you a review!");
+    }
+
+    public void sendJobApplicationNotificationToMember(JobApplication jobApplication) {
+        Member applicant = jobApplication.getApplicant();
+        Job job = jobApplication.getJob();
+        sendEmailToEmployee(job.getOwner().getEmail(),
+                "One of your jobs has received a new application!",
+                "User : " + applicant.getMemberData().getFirstName() + " " + applicant.getMemberData().getLastName() +
+                        " with email : " + applicant.getEmail() +
+                        " has just applied for one of your jobs!" +
+                        " Job title: " + job.getTitle());
+    }
+
+    public void sendJobInviteNotificationToMember(JobInvite jobInvite) {
+        Member member = jobInvite.getMember();
+        Job job = jobInvite.getJob();
+        sendEmailToEmployee(jobInvite.getMember().getEmail(),
+                "You have received a job application invite!",
+                "User : " + member.getMemberData().getFirstName() + " " + member.getMemberData().getLastName() +
+                        " with email : " + member.getEmail() +
+                        " has just send you a job invite for one of his jobs!" +
+                        " Job title: " + job.getTitle());
     }
 }

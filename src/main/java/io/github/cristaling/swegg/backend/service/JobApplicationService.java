@@ -20,12 +20,14 @@ public class JobApplicationService {
     private JobApplicationRepository jobApplicationRepository;
     private UserRepository userRepository;
     private JobRepository jobRepository;
+    private EmailSenderService emailSenderService;
 
     @Autowired
-    public JobApplicationService(JobApplicationRepository jobApplicationRepository, UserRepository userRepository, JobRepository jobRepository) {
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository, UserRepository userRepository, JobRepository jobRepository, EmailSenderService emailSenderService) {
         this.jobApplicationRepository = jobApplicationRepository;
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
+        this.emailSenderService = emailSenderService;
     }
 
 
@@ -49,6 +51,8 @@ public class JobApplicationService {
         jobApplication.setJob(job);
 
         jobApplicationRepository.save(jobApplication);
+
+        emailSenderService.sendJobApplicationNotificationToMember(jobApplication);
 
         return true;
     }

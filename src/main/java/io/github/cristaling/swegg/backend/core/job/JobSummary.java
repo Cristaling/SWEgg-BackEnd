@@ -2,6 +2,7 @@ package io.github.cristaling.swegg.backend.core.job;
 
 import io.github.cristaling.swegg.backend.core.abilities.Ability;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class JobSummary {
     private String description;
     private String employeeName;
     private String employeeEmail;
+    private JobStatus jobStatus;
     private List<Ability> abilities;
 
     public JobSummary() {
@@ -27,6 +29,7 @@ public class JobSummary {
         this.title = job.getTitle();
         this.ownerEmail = job.getOwner().getEmail();
         this.ownerName = job.getOwner().getMemberData().getFirstName() + " " + job.getOwner().getMemberData().getLastName();
+        this.jobStatus=job.getJobStatus();
         Member employee = job.getEmployee();
         if (employee != null) {
             this.employeeName = employee.getMemberData().getFirstName() + " " + employee.getMemberData().getLastName();
@@ -41,6 +44,7 @@ public class JobSummary {
         this.ownerEmail = jobWithAbilities.getOwner().getEmail();
         this.ownerName = jobWithAbilities.getOwner().getMemberData().getFirstName() + " " + jobWithAbilities.getOwner().getMemberData().getLastName();
         this.abilities = jobWithAbilities.getAbilities();
+        this.jobStatus=jobWithAbilities.getJobStatus();
         Member employee = jobWithAbilities.getEmployee();
         if (employee != null) {
             this.employeeName = employee.getMemberData().getFirstName() + " " + employee.getMemberData().getLastName();
@@ -110,5 +114,13 @@ public class JobSummary {
 
     public void setEmployeeEmail(String employeeEmail) {
         this.employeeEmail = employeeEmail;
+    }
+
+    public JobStatus getJobStatus() {
+        return jobStatus;
+    }
+
+    public void setJobStatus(JobStatus jobStatus) {
+        this.jobStatus = jobStatus;
     }
 }
