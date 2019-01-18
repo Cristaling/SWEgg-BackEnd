@@ -25,7 +25,7 @@ public class NewsletterTask {
     }
 
     List<Job> jobs=new ArrayList<>();
-    @Scheduled(cron = "0 8 * * *")
+    @Scheduled(cron = "0 8 * * * *")
 //    @Scheduled(fixedRate = 60000)
     public void sendNews(){
         System.out.println("Merge");
