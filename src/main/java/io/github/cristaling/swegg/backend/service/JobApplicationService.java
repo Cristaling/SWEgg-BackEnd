@@ -3,14 +3,18 @@ package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobApplication;
+import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.sockets.core.JobApplicationChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,13 +25,19 @@ public class JobApplicationService {
     private UserRepository userRepository;
     private JobRepository jobRepository;
     private EmailSenderService emailSenderService;
+    private NotificationService notificationService;
 
     @Autowired
-    public JobApplicationService(JobApplicationRepository jobApplicationRepository, UserRepository userRepository, JobRepository jobRepository, EmailSenderService emailSenderService) {
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository,
+                                 UserRepository userRepository,
+                                 JobRepository jobRepository,
+                                 EmailSenderService emailSenderService,
+                                 NotificationService notificationService) {
         this.jobApplicationRepository = jobApplicationRepository;
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
         this.emailSenderService = emailSenderService;
+        this.notificationService = notificationService;
     }
 
 
@@ -51,6 +61,16 @@ public class JobApplicationService {
         jobApplication.setJob(job);
 
         jobApplicationRepository.save(jobApplication);
+
+        JobApplicationChange jobApplicationChange=new JobApplicationChange();
+        jobApplicationChange.setJobSummary(new JobSummary(job));
+        notificationService.sendDataSecured(job.getOwner(),"jobapplication/add",jobApplicationChange);
+        Notification notification= new Notification();
+        notification.setDate(new Date());
+        notification.setMember(job.getOwner());
+        notification.setRead(false);
+        notification.setText("Your job got a new applicant ! ");
+        this.notificationService.addNotification(notification);
 
         emailSenderService.sendJobApplicationNotificationToMember(jobApplication);
 

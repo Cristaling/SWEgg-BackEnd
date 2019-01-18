@@ -1,8 +1,11 @@
 package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.core.recommendations.Recommend;
 import io.github.cristaling.swegg.backend.repositories.RecommendRepository;
+import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.sockets.core.RecommendChange;
 import io.github.cristaling.swegg.backend.utils.ServiceActionResult;
 import io.github.cristaling.swegg.backend.utils.enums.ErrorMessages;
 import io.github.cristaling.swegg.backend.web.responses.RecommendForProfile;
@@ -10,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -18,12 +22,20 @@ public class RecommendService {
     private RecommendRepository recommendRepository;
     private EmailSenderService emailSenderService;
     private UserService userService;
+    private NotificationService notificationService;
+    private UserRepository userRepository;
 
     @Autowired
-    public RecommendService(RecommendRepository recommendRepository, EmailSenderService emailSenderService, UserService userService) {
+    public RecommendService(RecommendRepository recommendRepository,
+                            EmailSenderService emailSenderService,
+                            UserService userService,
+                            NotificationService notificationService,
+                            UserRepository userRepository) {
         this.recommendRepository = recommendRepository;
         this.emailSenderService = emailSenderService;
         this.userService = userService;
+        this.notificationService = notificationService;
+        this.userRepository = userRepository;
     }
 
     public ServiceActionResult<List<Recommend>> addRecommend(List<String> recieversEmails, String recommendedEmail, String memberEmail) {
@@ -55,6 +67,17 @@ public class RecommendService {
             recommend.setRecommenderEmail(memberEmail);
 
             recommendRepository.saveAndFlush(recommend);
+
+            RecommendChange recommendChange = new RecommendChange();
+            recommendChange.setRecommendedEmail(memberEmail);
+            recommendChange.setRecommendEmail(recommendedEmail);
+            notificationService.sendDataSecured(userRepository.getMemberByEmail(memberEmail), "recommend/add", recommendChange);
+
+            Notification notification = new Notification();
+            notification.setDate(new Date());
+            notification.setMember(userRepository.getMemberByEmail(memberEmail));
+            notification.setRead(false);
+            notification.setText("You just got recommended a new member : " + userRepository.getMemberByEmail(recommendedEmail).getMemberData().getLastName());
 
             emailSenderService.sendNewRecommendationToMember(recommend);
 
