@@ -9,7 +9,6 @@ import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.MemberReviewRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
-import io.github.cristaling.swegg.backend.sockets.core.MemberReviewChange;
 import io.github.cristaling.swegg.backend.utils.ServiceActionResult;
 import io.github.cristaling.swegg.backend.utils.enums.ErrorMessages;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
@@ -88,9 +87,7 @@ public class MemberReviewService {
         this.memberReviewRepository.save(memberReview);
         this.memberReviewRepository.flush();
 
-        MemberReviewChange memberReviewChange=new MemberReviewChange();
-        memberReviewChange.setMemberName(reviewer.getMemberData().getFirstName()+ " " + reviewer.getMemberData().getLastName());
-        notificationService.sendDataSecured(reviewed,"review/add", memberReviewChange);
+        notificationService.sendDataSecured(reviewed,"review/add", this.getMemberReviewSummary(memberReview));
 
         Notification notification= new Notification();
         notification.setDate(new Date());

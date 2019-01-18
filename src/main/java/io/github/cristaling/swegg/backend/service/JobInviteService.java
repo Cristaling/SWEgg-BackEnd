@@ -7,7 +7,6 @@ import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.JobInviteRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
-import io.github.cristaling.swegg.backend.sockets.core.JobInviteChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -47,9 +46,7 @@ public class JobInviteService {
         this.jobInviteRepository.save(jobInvite);
         this.jobInviteRepository.flush();
 
-        JobInviteChange jobInviteChange=new JobInviteChange();
-        jobInviteChange.setJobSummary(new JobSummary(job));
-        notificationService.sendDataSecured(job.getOwner(),"jobinvite/add", jobInviteChange);
+        notificationService.sendDataSecured(job.getOwner(),"jobinvite/add", jobInvite);
 
         Notification notification= new Notification();
         notification.setDate(new Date());

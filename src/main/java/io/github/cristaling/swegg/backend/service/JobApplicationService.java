@@ -3,13 +3,11 @@ package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobApplication;
-import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
-import io.github.cristaling.swegg.backend.sockets.core.JobApplicationChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,9 +60,7 @@ public class JobApplicationService {
 
         jobApplicationRepository.save(jobApplication);
 
-        JobApplicationChange jobApplicationChange=new JobApplicationChange();
-        jobApplicationChange.setJobSummary(new JobSummary(job));
-        notificationService.sendDataSecured(job.getOwner(),"jobapplication/add",jobApplicationChange);
+        notificationService.sendDataSecured(job.getOwner(),"jobapplication/add",jobApplication);
         Notification notification= new Notification();
         notification.setDate(new Date());
         notification.setMember(job.getOwner());
