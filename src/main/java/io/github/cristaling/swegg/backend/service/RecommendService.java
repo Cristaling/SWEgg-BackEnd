@@ -59,6 +59,13 @@ public class RecommendService {
 
         List<Recommend> recommends = new ArrayList<>();
 
+        Notification notification = new Notification();
+        notification.setDate(new Date());
+        notification.setMember(userRepository.getMemberByEmail(recommendedEmail));
+        notification.setRead(false);
+        notification.setText("Someone just recommended you!");
+        this.notificationService.addNotification(notification);
+
         for (String recieverEmail : recieversEmails) {
             Recommend recommend = new Recommend();
             recommend.setReceiver(recieverEmail);
@@ -69,15 +76,15 @@ public class RecommendService {
 
             RecommendForProfile recommendForProfile = new RecommendForProfile();
             recommendForProfile.setRecommenderEmail(memberEmail);
-            recommendForProfile.setRecommendedSummary(userService.getProfileInternal(recieverEmail));
+            recommendForProfile.setRecommendedSummary(userService.getProfileInternal(recommendedEmail));
             recommendForProfile.setRecommenderFirstName(userService.getProfileInternal(memberEmail).getFirstName());
             recommendForProfile.setRecommenderLastName(userService.getProfileInternal(memberEmail).getLastName());
 
             notificationService.sendDataSecured(userRepository.getMemberByEmail(memberEmail), "recommend/add", recommendForProfile);
 
-            Notification notification = new Notification();
+            notification = new Notification();
             notification.setDate(new Date());
-            notification.setMember(userRepository.getMemberByEmail(memberEmail));
+            notification.setMember(userRepository.getMemberByEmail(recieverEmail));
             notification.setRead(false);
             notification.setText("You just got recommended a new member : " + userRepository.getMemberByEmail(recommendedEmail).getMemberData().getLastName());
             this.notificationService.addNotification(notification);
@@ -99,7 +106,7 @@ public class RecommendService {
         for (Recommend recommend : recommends) {
             RecommendForProfile recommendForProfile = new RecommendForProfile();
             recommendForProfile.setRecommenderEmail(recommend.getRecommenderEmail());
-            recommendForProfile.setRecommendedSummary(userService.getProfileInternal(recommend.getReceiver()));
+            recommendForProfile.setRecommendedSummary(userService.getProfileInternal(recommend.getRecommendedEmail()));
             recommendForProfile.setRecommenderFirstName(userService.getProfileInternal(recommend.getRecommenderEmail()).getFirstName());
             recommendForProfile.setRecommenderLastName(userService.getProfileInternal(recommend.getRecommenderEmail()).getLastName());
             recommendForProfileList.add(recommendForProfile);
