@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -125,7 +126,12 @@ public class UserService {
 	@Transactional
     public List<UserSummaryResponse> getSearchedUsers(String name, int page, int count) {
 		List<UserSummaryResponse> userSummaryResponses = new ArrayList<>();
-		List<Member> members= this.userRepository.getMemberByCompleteNameIgnoreCase(PageRequest.of(page, count), name.toLowerCase()).getContent();
+		List<Member> members= this.userRepository.getMemberByCompleteNameIgnoreCase(PageRequest.of(page, count),
+				name.toLowerCase())
+				.getContent()
+				.stream()
+				.filter(Member::isVerified)
+				.collect(Collectors.toList());
 		for(Member member : members) {
 			UserSummaryResponse userSummaryResponse = new UserSummaryResponse();
 			userSummaryResponse.setEmail(member.getEmail());

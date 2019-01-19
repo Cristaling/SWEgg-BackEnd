@@ -117,6 +117,7 @@ public class SecurityService {
 				memberData.setPicture(ImageUtils.getBytesFromURL(pictureUrl));
 
 				Member member = new Member();
+				member.setVerified(true);
 				member.setEmail(email);
 				member.setPassword(UUID.randomUUID().toString());
 				member.setMemberData(memberData);
