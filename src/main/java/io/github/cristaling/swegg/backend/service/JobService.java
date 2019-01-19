@@ -169,8 +169,12 @@ public class JobService {
 		return new JobSummary(jobWithAbilities);
 	}
 
-	public JobWithAbilities getJob(UUID uuid) {
+	public JobWithAbilities getJobWithAbilities(UUID uuid) {
 		return addAbilitiesToJob(this.jobRepository.getOne(uuid));
+	}
+
+	public Job getJob(UUID uuid) {
+		return this.jobRepository.getOne(uuid);
 	}
 
 	public List<JobSummary> getTopRelevantJobs(List<Ability> abilities) {
@@ -299,7 +303,6 @@ public class JobService {
 	public JobWithAbilities updateJob(String uuid, JobAddRequest jobAddRequest) {
 		Job job= jobRepository.getByUuid(UUID.fromString(uuid));
 		logger.info("Job Owner: " + job.getOwner().getEmail());
-		job.setJobStatus(jobAddRequest.getJobStatus());
 		job.setDescription(jobAddRequest.getDescription());
 		job.setTitle(jobAddRequest.getTitle());
 		jobRepository.save(job);

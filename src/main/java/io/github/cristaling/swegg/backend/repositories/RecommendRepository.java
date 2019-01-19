@@ -10,4 +10,6 @@ public interface RecommendRepository extends JpaRepository<Recommend, UUID> {
     Recommend getRecommendByRecommendedEmailAndRecommenderEmailAndReceiver(String recommended, String recommender, String receiver);
 
     List<Recommend> getRecommendsByRecommendedEmail(String recommended);
+    List<Recommend> getRecommendsByRecommenderEmail(String recommender);
+    List<Recommend> getRecommendsByReceiver(String receiver);
 }

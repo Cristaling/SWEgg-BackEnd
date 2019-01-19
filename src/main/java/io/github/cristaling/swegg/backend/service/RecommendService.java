@@ -95,7 +95,7 @@ public class RecommendService {
     public ServiceActionResult<List<RecommendForProfile>> getRecommendations(Member member) {
         ServiceActionResult<List<RecommendForProfile>> recommendationList = new ServiceActionResult<>();
         List<RecommendForProfile> recommendForProfileList = new ArrayList<>();
-        List<Recommend> recommends = recommendRepository.getRecommendsByRecommendedEmail(member.getEmail());
+        List<Recommend> recommends = recommendRepository.getRecommendsByReceiver(member.getEmail());
         for (Recommend recommend : recommends) {
             RecommendForProfile recommendForProfile = new RecommendForProfile();
             recommendForProfile.setRecommenderEmail(recommend.getRecommenderEmail());

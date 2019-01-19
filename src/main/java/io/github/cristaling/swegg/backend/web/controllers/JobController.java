@@ -107,7 +107,7 @@ public class JobController {
 		}
 
         UUID uuid = UUID.fromString(jobUUID);
-        JobSummary job = new JobSummary(this.jobService.getJob(uuid));
+        JobSummary job = new JobSummary(this.jobService.getJobWithAbilities(uuid));
 
 		if (job == null) {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
