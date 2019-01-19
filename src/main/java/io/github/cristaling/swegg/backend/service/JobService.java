@@ -19,6 +19,8 @@ import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.requests.JobUpdateStatusRequest;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class JobService {
+
+	private Logger logger = LogManager.getLogger(JobService.class);
 
 	private JobRepository jobRepository;
 	private UserRepository userRepository;
@@ -294,10 +298,12 @@ public class JobService {
 
 	public JobWithAbilities updateJob(String uuid, JobAddRequest jobAddRequest) {
 		Job job= jobRepository.getByUuid(UUID.fromString(uuid));
+		logger.info("Job Owner: " + job.getOwner().getEmail());
 		job.setJobStatus(jobAddRequest.getJobStatus());
 		job.setDescription(jobAddRequest.getDescription());
 		job.setTitle(jobAddRequest.getTitle());
 		jobRepository.save(job);
+		logger.info("Job Owner After: " + job.getOwner().getEmail());
 		return new JobWithAbilities(job);
 	}
 

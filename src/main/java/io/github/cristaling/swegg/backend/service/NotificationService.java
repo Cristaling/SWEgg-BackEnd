@@ -64,8 +64,8 @@ public class NotificationService {
 	}
 
 	public void addNotification(Notification notification) {
-		sendDataSecured(notification.getMember(), "/notifications", notification);
 		this.notificationRepository.save(notification);
+		sendDataSecured(notification.getMember(), "/notifications", notification);
 	}
 
 	/**
