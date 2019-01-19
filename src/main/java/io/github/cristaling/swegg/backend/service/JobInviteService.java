@@ -46,7 +46,7 @@ public class JobInviteService {
         this.jobInviteRepository.save(jobInvite);
         this.jobInviteRepository.flush();
 
-        notificationService.sendDataSecured(job.getOwner(),"jobinvite/add", jobInvite);
+        notificationService.sendDataSecured(job.getOwner(),"jobinvite/add", new JobSummary(job));
 
         Notification notification= new Notification();
         notification.setDate(new Date());
