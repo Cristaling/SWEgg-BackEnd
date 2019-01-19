@@ -3,11 +3,13 @@ package io.github.cristaling.swegg.backend.service;
 
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobApplication;
+import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.sockets.core.JobApplicationChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,8 +62,11 @@ public class JobApplicationService {
 
         jobApplicationRepository.save(jobApplication);
 
-        notificationService.sendDataSecured(job.getOwner(),"jobapplication/add",jobApplication);
-        Notification notification= new Notification();
+        JobApplicationChange jobApplicationChange = new JobApplicationChange();
+        jobApplicationChange.setApplicantEmail(jobApplication.getApplicant().getEmail());
+        jobApplicationChange.setJobSummary(new JobSummary(jobApplication.getJob()));
+        notificationService.sendDataSecured(job.getOwner(), "jobapplication/add", jobApplicationChange);
+        Notification notification = new Notification();
         notification.setDate(new Date());
         notification.setMember(job.getOwner());
         notification.setRead(false);
@@ -77,15 +82,15 @@ public class JobApplicationService {
         return jobApplicationRepository.findAll();
     }
 
-    public List<JobApplication> getApplicationsForApplicant(String email){
+    public List<JobApplication> getApplicationsForApplicant(String email) {
         Member applicator = userRepository.getMemberByEmail(email);
-        if(applicator==null){
+        if (applicator == null) {
             return null;
         }
         return jobApplicationRepository.getJobApplicationsByApplicant(applicator);
     }
 
-    public List<JobApplication> getApplicationsForJob(UUID uuid){
+    public List<JobApplication> getApplicationsForJob(UUID uuid) {
         try {
             Job job = jobRepository.getOne(uuid);
             return jobApplicationRepository.getJobApplicationsByJob(job);
