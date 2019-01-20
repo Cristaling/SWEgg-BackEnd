@@ -31,9 +31,9 @@ public class NewsletterTask {
         System.out.println("Merge");
         List<Member> subscribers = this.userService.getMembersForSubscriptions();
 
-        subscribers.forEach(member -> {
-            emailSenderService.sendnewsletter(member);
-        });
+//        subscribers.forEach(member -> {
+//            emailSenderService.sendnewsletter(member);
+//        });
 
 
         jobs.clear();
