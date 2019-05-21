@@ -38,7 +38,7 @@ public class SecurityService {
 		this.userDataRepository = userDataRepository;
 
 		this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), Utils.getDefaultJsonFactory())
-				.setAudience(Arrays.asList("571895084013-hcqh7qd55ueagegmd13efpin3tq6hcim.apps.googleusercontent.com"))
+				.setAudience(Arrays.asList("571895084013-teqrvlauic9jildntoofkagrgitvck7m.apps.googleusercontent.com"))
 				.build();
 	}
 
@@ -117,6 +117,7 @@ public class SecurityService {
 				memberData.setPicture(ImageUtils.getBytesFromURL(pictureUrl));
 
 				Member member = new Member();
+				member.setVerified(true);
 				member.setEmail(email);
 				member.setPassword(UUID.randomUUID().toString());
 				member.setMemberData(memberData);

@@ -6,30 +6,33 @@ import io.github.cristaling.swegg.backend.core.abilities.Endorsement;
 import io.github.cristaling.swegg.backend.core.job.Job;
 import io.github.cristaling.swegg.backend.core.job.JobSummary;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.AbilityRepository;
 import io.github.cristaling.swegg.backend.repositories.AbilityUseRepository;
 import io.github.cristaling.swegg.backend.repositories.EndorsementRepository;
 import io.github.cristaling.swegg.backend.repositories.JobApplicationRepository;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
+import io.github.cristaling.swegg.backend.schedulers.NewsletterTask;
 import io.github.cristaling.swegg.backend.utils.enums.JobStatus;
 import io.github.cristaling.swegg.backend.web.requests.JobAddRequest;
 import io.github.cristaling.swegg.backend.web.requests.JobUpdateStatusRequest;
 import io.github.cristaling.swegg.backend.web.responses.JobWithAbilities;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class JobService {
+
+	private Logger logger = LogManager.getLogger(JobService.class);
 
 	private JobRepository jobRepository;
 	private UserRepository userRepository;
@@ -42,9 +45,19 @@ public class JobService {
 	private NotificationService notificationService;
 
 	private AbilityService abilityService;
+	private NewsletterTask newsletterTask;
 
 	@Autowired
-	public JobService(JobRepository jobRepository, UserRepository userRepository, JobApplicationRepository jobApplicationRepository, AbilityUseRepository abilityUseRepository, AbilityRepository abilityRepository, EndorsementRepository endorsementRepository, EmailSenderService emailSenderService, NotificationService notificationService, AbilityService abilityService) {
+	public JobService(JobRepository jobRepository,
+					  UserRepository userRepository,
+					  JobApplicationRepository jobApplicationRepository,
+					  AbilityUseRepository abilityUseRepository,
+					  AbilityRepository abilityRepository,
+					  EndorsementRepository endorsementRepository,
+					  EmailSenderService emailSenderService,
+					  NotificationService notificationService,
+					  AbilityService abilityService,
+					  NewsletterTask newsletterTask) {
 		this.jobRepository = jobRepository;
 		this.userRepository = userRepository;
 		this.jobApplicationRepository = jobApplicationRepository;
@@ -54,6 +67,7 @@ public class JobService {
 		this.emailSenderService = emailSenderService;
 		this.notificationService = notificationService;
 		this.abilityService = abilityService;
+		this.newsletterTask = newsletterTask;
 	}
 
 	private JobWithAbilities addAbilitiesToJob(Job job) {
@@ -103,6 +117,8 @@ public class JobService {
 			}
 		}
 
+		newsletterTask.addJob(job);
+
 		return addAbilitiesToJob(job);
 	}
 
@@ -116,7 +132,7 @@ public class JobService {
 			if (page < 0) {
 				jobs = this.jobRepository.findAll();
 			} else {
-				jobs = this.jobRepository.findAll(PageRequest.of(page, count)).getContent();
+				jobs = this.jobRepository.getAllJobsOpen(PageRequest.of(page, count)).getContent();
 			}
 		} else {
 			if (page < 0) {
@@ -153,8 +169,12 @@ public class JobService {
 		return new JobSummary(jobWithAbilities);
 	}
 
-	public JobWithAbilities getJob(UUID uuid) {
+	public JobWithAbilities getJobWithAbilities(UUID uuid) {
 		return addAbilitiesToJob(this.jobRepository.getOne(uuid));
+	}
+
+	public Job getJob(UUID uuid) {
+		return this.jobRepository.getOne(uuid);
 	}
 
 	public List<JobSummary> getTopRelevantJobs(List<Ability> abilities) {
@@ -201,6 +221,17 @@ public class JobService {
 		job.setJobStatus(JobStatus.ACCEPTED);
 		this.jobRepository.save(job);
 		this.jobRepository.flush();
+
+		notificationService.sendDataSecured(employee,"job/select", new JobSummary(job));
+
+		Notification notification= new Notification();
+		notification.setDate(new Date());
+		notification.setMember(employee);
+		notification.setRead(false);
+		notification.setText("You just got accepted by : " + job.getOwner().getMemberData().getLastName() + " " + job.getOwner().getMemberData().getFirstName());
+
+		this.notificationService.addNotification(notification);
+
 
 		emailSenderService.sendJobSelectionNotificationToMember(job);
 
@@ -271,10 +302,15 @@ public class JobService {
 
 	public JobWithAbilities updateJob(String uuid, JobAddRequest jobAddRequest) {
 		Job job= jobRepository.getByUuid(UUID.fromString(uuid));
-		job.setJobStatus(jobAddRequest.getJobStatus());
+		logger.info("Job Owner: " + job.getOwner().getEmail());
 		job.setDescription(jobAddRequest.getDescription());
 		job.setTitle(jobAddRequest.getTitle());
 		jobRepository.save(job);
+		logger.info("Job Owner After: " + job.getOwner().getEmail());
 		return new JobWithAbilities(job);
+	}
+
+	public List<Ability> getAbilitiesForJob(UUID jobUuid) {
+		return this.abilityUseRepository.getAbilityUsesByJob(this.jobRepository.getByUuid(jobUuid)).stream().map(AbilityUse::getAbility).collect(Collectors.toList());
 	}
 }

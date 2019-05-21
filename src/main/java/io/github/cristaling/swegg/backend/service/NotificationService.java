@@ -55,6 +55,7 @@ public class NotificationService {
 		}
 
 		notification.setRead(true);
+		this.notificationRepository.save(notification);
 	}
 
 	public void addNotification(Member member, String text) {
@@ -63,8 +64,8 @@ public class NotificationService {
 	}
 
 	public void addNotification(Notification notification) {
-		sendDataSecured(notification.getMember(), "/notifications", notification);
 		this.notificationRepository.save(notification);
+		sendDataSecured(notification.getMember(), "/notifications", notification);
 	}
 
 	/**

@@ -38,11 +38,7 @@ public class JobInviteController {
         if (!this.securityService.canAccessRole(token, MemberRole.CLIENT)) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-        JobWithAbilities jobWithAbilities = this.jobService.getJob(UUID.fromString(addJobInviteRequest.getJobUUID()));
-        if(jobWithAbilities==null){
-            return new ResponseEntity("Job does not exist!", HttpStatus.BAD_REQUEST);
-        }
-        Job job = new Job(jobWithAbilities);
+        Job job = this.jobService.getJob(UUID.fromString(addJobInviteRequest.getJobUUID()));
         Member jobOwner = this.securityService.getUserByToken(token);
         if (!job.getOwner().getUuid().equals(jobOwner.getUuid())) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);

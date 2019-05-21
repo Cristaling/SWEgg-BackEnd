@@ -3,6 +3,7 @@ package io.github.cristaling.swegg.backend.service;
 import io.github.cristaling.swegg.backend.core.abilities.Ability;
 import io.github.cristaling.swegg.backend.core.abilities.Endorsement;
 import io.github.cristaling.swegg.backend.core.member.Member;
+import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.AbilityRepository;
 import io.github.cristaling.swegg.backend.repositories.EndorsementRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -112,7 +114,13 @@ public class AbilityService {
 			EndorsementChange endorsementChange = new EndorsementChange();
 			endorsementChange.setAbility(existent.getAbility().getName());
 			endorsementChange.setEmail(endorser.getEmail());
-			this.notificationService.sendDataUnsecured(endorsed, "/endorsement/delete", endorsementChange);
+			this.notificationService.sendDataSecured(endorsed, "/endorsement/delete", endorsementChange);
+			Notification notification= new Notification();
+			notification.setDate(new Date());
+			notification.setMember(endorsed);
+			notification.setRead(false);
+			notification.setText("Your ability just got un-endorsed : " + ability.getName());
+			this.notificationService.addNotification(notification);
 			return;
 		}
 
@@ -126,7 +134,13 @@ public class AbilityService {
 		EndorsementChange endorsementChange = new EndorsementChange();
 		endorsementChange.setAbility(ability.getName());
 		endorsementChange.setEmail(endorser.getEmail());
-		this.notificationService.sendDataUnsecured(endorsed, "/endorsement/add", endorsementChange);
+		this.notificationService.sendDataSecured(endorsed, "/endorsement/add", endorsementChange);
+		Notification notification= new Notification();
+		notification.setDate(new Date());
+		notification.setMember(endorsed);
+		notification.setRead(false);
+		notification.setText("Your ability just got endorsed : " + ability.getName());
+		this.notificationService.addNotification(notification);
 	}
 
 	public Ability getAbilityByName(String abilityName) {

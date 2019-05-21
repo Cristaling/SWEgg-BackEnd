@@ -5,6 +5,7 @@ import io.github.cristaling.swegg.backend.core.member.Member;
 import io.github.cristaling.swegg.backend.core.member.MemberData;
 import io.github.cristaling.swegg.backend.core.member.MemberReview;
 import io.github.cristaling.swegg.backend.core.member.MemberReviewSummary;
+import io.github.cristaling.swegg.backend.core.notifications.Notification;
 import io.github.cristaling.swegg.backend.repositories.JobRepository;
 import io.github.cristaling.swegg.backend.repositories.MemberReviewRepository;
 import io.github.cristaling.swegg.backend.repositories.UserRepository;
@@ -25,13 +26,19 @@ public class MemberReviewService {
     private UserRepository userRepository;
     private JobRepository jobRepository;
     private EmailSenderService emailSenderService;
+    private NotificationService notificationService;
 
     @Autowired
-    public MemberReviewService(MemberReviewRepository memberReviewRepository, UserRepository userRepository, JobRepository jobRepository, EmailSenderService emailSenderService) {
+    public MemberReviewService(MemberReviewRepository memberReviewRepository,
+                               UserRepository userRepository,
+                               JobRepository jobRepository,
+                               EmailSenderService emailSenderService,
+                               NotificationService notificationService) {
         this.memberReviewRepository = memberReviewRepository;
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
         this.emailSenderService = emailSenderService;
+        this.notificationService = notificationService;
     }
 
     public ServiceActionResult<MemberReviewSummary> addMemberReview(Member reviewer, String reviewedEmail, String text, int stars){
@@ -89,6 +96,15 @@ public class MemberReviewService {
 
         this.memberReviewRepository.save(memberReview);
         this.memberReviewRepository.flush();
+
+        notificationService.sendDataSecured(reviewed,"review/add", this.getMemberReviewSummary(memberReview));
+
+        Notification notification= new Notification();
+        notification.setDate(new Date());
+        notification.setMember(reviewed);
+        notification.setRead(false);
+        notification.setText("You just got reviewed by : " + reviewer.getMemberData().getLastName() + " " + reviewer.getMemberData().getFirstName());
+        this.notificationService.addNotification(notification);
 
         emailSenderService.sendReviewNotificationToMember(memberReview);
 

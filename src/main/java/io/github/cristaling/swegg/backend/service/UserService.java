@@ -11,6 +11,7 @@ import io.github.cristaling.swegg.backend.web.requests.UpdateProfileRequest;
 import io.github.cristaling.swegg.backend.web.responses.ProfileResponse;
 import io.github.cristaling.swegg.backend.web.responses.UserSummaryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -114,7 +116,7 @@ public class UserService {
 		}
 		byte[] picture=user.getMemberData().getPicture();
 		if(picture==null){
-			File file =  new File("src\\main\\resources\\image\\user-default-image.jpeg");
+			File file = new ClassPathResource("user-default-image.jpeg").getFile();
 			FileInputStream fileInputStreamReader = new FileInputStream(file);
 			picture = new byte[(int)file.length()];
 			fileInputStreamReader.read(picture);
@@ -125,7 +127,12 @@ public class UserService {
 	@Transactional
     public List<UserSummaryResponse> getSearchedUsers(String name, int page, int count) {
 		List<UserSummaryResponse> userSummaryResponses = new ArrayList<>();
-		List<Member> members= this.userRepository.getMemberByCompleteNameIgnoreCase(PageRequest.of(page, count), name.toLowerCase()).getContent();
+		List<Member> members= this.userRepository.getMemberByCompleteNameIgnoreCase(PageRequest.of(page, count),
+				name.toLowerCase())
+				.getContent()
+				.stream()
+				.filter(Member::isVerified)
+				.collect(Collectors.toList());
 		for(Member member : members) {
 			UserSummaryResponse userSummaryResponse = new UserSummaryResponse();
 			userSummaryResponse.setEmail(member.getEmail());
@@ -151,6 +158,10 @@ public class UserService {
 				.collect(Collectors.toList());
 
 		return response;
+	}
+
+	public List<Member> getMembersForSubscriptions(){
+		return userRepository.findAll();
 	}
 
 }
