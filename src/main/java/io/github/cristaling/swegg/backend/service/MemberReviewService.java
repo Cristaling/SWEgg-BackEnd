@@ -35,23 +35,30 @@ public class MemberReviewService {
     }
 
     public ServiceActionResult<MemberReviewSummary> addMemberReview(Member reviewer, String reviewedEmail, String text, int stars){
+
         ServiceActionResult<MemberReviewSummary> result = new ServiceActionResult<>();
+
         if(stars==0){
             result.setError(ErrorMessages.REVIEW_STARS_MISSING);
             return result;
         }
+
         Member reviewed = this.userRepository.getMemberByEmail(reviewedEmail);
+
         if(reviewed == null){
             result.setError(ErrorMessages.USER_DOES_NOT_EXIST);
             return result;
         }
+
         MemberReview review = this.memberReviewRepository.getMemberReviewByReviewerAndReviewed(reviewer,reviewed);
+
         MemberReview memberReview = new MemberReview();
         memberReview.setReviewed(reviewed);
         memberReview.setReviewer(reviewer);
         memberReview.setText(text);
         memberReview.setStars(stars);
         memberReview.setDateGiven(new Date());
+
         if(review != null){
             memberReview.setUuid(review.getUuid());
             this.memberReviewRepository.save(memberReview);
@@ -59,11 +66,14 @@ public class MemberReviewService {
             result.setResult(this.getMemberReviewSummary(review));
             return result;
         }
+
         List<Job> jobs = this.jobRepository.getJobsByOwnerAndEmployee(reviewer, reviewed);
+
         if(jobs.size() == 0){
             result.setError(ErrorMessages.JOB_DOES_NOT_EXIST);
             return result;
         }
+
         boolean isOk = false;
         for(Job job : jobs) {
             if (job.getJobStatus().equals(JobStatus.DONE)) {
