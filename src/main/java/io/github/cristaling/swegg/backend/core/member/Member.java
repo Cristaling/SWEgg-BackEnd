@@ -35,6 +35,9 @@ public class Member {
 
 	private boolean isVerified;
 
+	public Member() {
+	}
+
 	public UUID getUuid() {
 		return uuid;
 	}
